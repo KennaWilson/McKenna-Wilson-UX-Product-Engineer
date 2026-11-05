@@ -1,0 +1,5074 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta name="vibe-ui" content="cassette-walkman">
+  <title>✦ McKenna Wilson — UX Engineer</title>
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,700&family=Nunito:wght@400;600;700;800;900&family=Fira+Code:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="agent-guide.css">
+  <style>
+    :root {
+      --cream: #fdf8f0;
+      --ink: #1a1207;
+      --coral: #ff6b4a;
+      --mint: #3ecf8e;
+      --lemon: #ffe145;
+      --sky: #7ec8e3;
+      --lilac: #c8a8f9;
+      --peach: #ffb347;
+      --rose: #ff8fa3;
+      --border-w: 2.5px;
+      --radius: 16px;
+      --radius-sm: 8px;
+      --shadow: 4px 4px 0px var(--ink);
+      --shadow-lg: 6px 6px 0px var(--ink);
+      --shadow-xl: 8px 8px 0px var(--ink);
+      --display: 'Fraunces', serif;
+      --sans: 'Nunito', sans-serif;
+      --mono: 'Fira Code', monospace;
+      --content-max: 1140px;
+      --page-gutter: clamp(20px, 4vw, 80px);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: var(--sans);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Cursor */
+    .cursor {
+      width: 18px;
+      height: 18px;
+      background: var(--coral);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.15s, background 0.2s;
+      mix-blend-mode: multiply;
+    }
+
+    .cursor-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--ink);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 10000;
+    }
+
+    .cursor-trail {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9998;
+      background: var(--coral);
+      opacity: 0.55;
+      transform: translate(-50%, -50%) scale(1);
+      animation: trailFade 450ms ease-out forwards;
+    }
+
+    @keyframes trailFade {
+      to {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.2);
+      }
+    }
+
+    #loader:not(.hide)~.cursor-trail {
+      mix-blend-mode: normal;
+      opacity: 0.75;
+    }
+
+    #loader:not(.hide)~.cursor {
+      mix-blend-mode: normal;
+      background: var(--lemon);
+      border: 2px solid var(--cream);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35), 0 0 14px rgba(255, 225, 69, 0.55);
+    }
+
+    #loader:not(.hide)~.cursor-dot {
+      background: var(--cream);
+      box-shadow: 0 0 6px rgba(255, 248, 240, 0.9);
+    }
+
+    /* Doodle BG */
+    .doodle-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+      opacity: 0.055;
+    }
+
+    .doodle-bg svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Progress bar */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      z-index: 900;
+      background: repeating-linear-gradient(90deg, var(--coral) 0%, var(--lemon) 25%, var(--mint) 50%, var(--sky) 75%, var(--lilac) 100%);
+      transform-origin: left;
+      transform: scaleX(0);
+      transition: transform 0.1s linear;
+    }
+
+    /* Nav */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 500;
+      padding: 14px var(--page-gutter);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: var(--cream);
+      border-bottom: var(--border-w) solid var(--ink);
+    }
+
+    .nav-logo {
+      font-family: var(--display);
+      font-size: 22px;
+      font-weight: 900;
+      font-style: italic;
+      color: var(--ink);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .nav-logo .logo-badge {
+      background: var(--lemon);
+      border: var(--border-w) solid var(--ink);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-family: var(--mono);
+      font-style: normal;
+      font-weight: 500;
+      box-shadow: 2px 2px 0 var(--ink);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .nav-toggle {
+      display: none;
+      width: 44px;
+      height: 44px;
+      border: var(--border-w) solid var(--ink);
+      border-radius: 10px;
+      background: var(--lemon);
+      box-shadow: var(--shadow);
+      cursor: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 0;
+      flex-shrink: 0;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .nav-toggle:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .nav-toggle-bar {
+      display: block;
+      width: 20px;
+      height: 2.5px;
+      background: var(--ink);
+      border-radius: 2px;
+      transition: transform 0.25s ease, opacity 0.25s ease;
+    }
+
+    nav.menu-open .nav-toggle-bar:nth-child(1) {
+      transform: translateY(7.5px) rotate(45deg);
+    }
+
+    nav.menu-open .nav-toggle-bar:nth-child(2) {
+      opacity: 0;
+    }
+
+    nav.menu-open .nav-toggle-bar:nth-child(3) {
+      transform: translateY(-7.5px) rotate(-45deg);
+    }
+
+    .nav-menu {
+      display: contents;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .nav-links a {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+      text-decoration: none;
+      padding: 6px 14px;
+      border-radius: 100px;
+      border: var(--border-w) solid transparent;
+      transition: all 0.15s;
+    }
+
+    .nav-links a:hover {
+      background: var(--lemon);
+      border-color: var(--ink);
+      box-shadow: var(--shadow);
+      transform: translateY(-2px);
+    }
+
+    .nav-links .contact-btn {
+      background: var(--coral);
+      color: #fff;
+      border-color: var(--ink);
+      box-shadow: var(--shadow);
+    }
+
+    .nav-links .contact-btn:hover {
+      background: #ff5c39;
+      color: var(--ink);
+      border-color: var(--ink);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+    }
+
+    .nav-score {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 12px;
+      background: var(--ink);
+      color: var(--lemon);
+      padding: 6px 14px;
+      border-radius: 100px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: transform 0.2s, background 0.2s, color 0.2s;
+    }
+
+    .nav-score.xp-bump {
+      animation: xpNavBump 0.55s cubic-bezier(.34, 1.56, .64, 1);
+    }
+
+    @keyframes xpNavBump {
+      0% { transform: scale(1); }
+      35% { transform: scale(1.14); background: var(--lemon); color: var(--ink); }
+      100% { transform: scale(1); }
+    }
+
+    .nav-score .star {
+      animation: spinStar 4s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes spinStar {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .nav-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 499;
+      background: rgba(26, 18, 7, 0.35);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .nav-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    @media (max-width: 820px) {
+      nav {
+        padding: 12px 16px;
+        flex-wrap: wrap;
+      }
+
+      .nav-logo {
+        font-size: 18px;
+      }
+
+      .nav-toggle {
+        display: flex;
+      }
+
+      .nav-backdrop {
+        display: block;
+      }
+
+      .nav-actions {
+        margin-left: auto;
+      }
+
+      .nav-menu {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        order: 3;
+        padding: 8px 0 4px;
+        gap: 8px;
+      }
+
+      nav.menu-open .nav-menu {
+        display: flex;
+      }
+
+      .nav-links {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        gap: 8px;
+        flex: none;
+        justify-content: flex-start;
+      }
+
+      .nav-links a {
+        font-size: 15px;
+        padding: 12px 16px;
+        border-radius: var(--radius-sm);
+        border-color: var(--ink);
+        background: #fff;
+        box-shadow: var(--shadow);
+        text-align: center;
+      }
+
+      .nav-links a:hover {
+        transform: translate(-2px, -2px);
+      }
+
+      .nav-links .contact-btn {
+        color: #fff;
+      }
+
+      .nav-score {
+        font-size: 11px;
+        padding: 6px 12px;
+      }
+
+      .hero {
+        padding: 100px 20px 60px;
+      }
+
+      .section-wrap {
+        padding: 60px 20px;
+      }
+
+      .pc-top {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 24px;
+        gap: 16px;
+      }
+
+      .contact-card {
+        min-width: 0;
+        width: 100%;
+      }
+
+      .toast {
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+        max-width: none;
+      }
+
+      body { cursor: auto; }
+      .cursor, .cursor-dot, .cursor-trail { display: none !important; }
+      a, button, .skill-card, .project-card, .ach-card, .astat, .contact-card, .htag, .vis-card, .nav-toggle, .agent-orb, .agent-close, .agent-preset, .agent-chip, .agent-next, .pc-xp-badge:not(.collected), .vibe-btn, .tape-card, #dinoGameStart { cursor: pointer; }
+    }
+
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      max-width: 1760px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 120px var(--page-gutter) 80px;
+      position: relative;
+      z-index: 1;
+      gap: 60px;
+    }
+
+    .hero-text {
+      flex: 1;
+    }
+
+    .hero-name {
+      font-family: var(--display);
+      font-size: clamp(56px, 8vw, 100px);
+      font-weight: 900;
+      line-height: 0.9;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+
+    .hero-name em {
+      font-style: italic;
+      color: var(--coral);
+      position: relative;
+    }
+
+    .hero-name em::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 4px;
+      right: 0;
+      height: 7px;
+      background: var(--lemon);
+      z-index: -1;
+      transform: rotate(-1deg);
+    }
+
+    .hero-role {
+      font-size: 17px;
+      font-weight: 600;
+      opacity: 0.6;
+      margin-bottom: 32px;
+      line-height: 1.65;
+      max-width: 440px;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 40px;
+    }
+
+    .htag {
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: var(--border-w) solid var(--ink);
+      box-shadow: 3px 3px 0 var(--ink);
+      transition: transform 0.15s, box-shadow 0.15s;
+      cursor: none;
+      appearance: none;
+      -webkit-appearance: none;
+      color: inherit;
+      line-height: 1.2;
+    }
+
+    .htag:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0 var(--ink);
+    }
+
+    .htag-1 {
+      background: var(--coral);
+      color: #fff;
+    }
+
+    .htag-2 {
+      background: var(--sky);
+    }
+
+    .htag-3 {
+      background: var(--lemon);
+    }
+
+    .htag-4 {
+      background: var(--lilac);
+    }
+
+    .htag-5 {
+      background: var(--mint);
+    }
+
+    .htag-6 {
+      background: var(--peach);
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Buttons */
+    .btn {
+      font-family: var(--sans);
+      font-weight: 800;
+      font-size: 14px;
+      padding: 14px 28px;
+      border-radius: 12px;
+      border: var(--border-w) solid var(--ink);
+      box-shadow: var(--shadow);
+      cursor: none;
+      text-decoration: none;
+      transition: all 0.15s;
+      display: inline-block;
+    }
+
+    .btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0 var(--ink);
+    }
+
+    .btn-fill {
+      background: var(--ink);
+      color: var(--lemon);
+    }
+
+    .btn-outline {
+      background: var(--cream);
+      color: var(--ink);
+    }
+
+    /* Hero visual cards */
+    .hero-visual {
+      --hv-scale: 1;
+      flex-shrink: 0;
+      width: calc(420px * var(--hv-scale));
+      height: calc(380px * var(--hv-scale));
+      position: relative;
+      display: none;
+    }
+
+    @media(min-width:1000px) {
+      .hero-visual {
+        display: block;
+      }
+    }
+
+    .hero-photo {
+      position: absolute;
+      top: calc(26px * var(--hv-scale));
+      left: calc(-80px * var(--hv-scale));
+      width: calc(190px * var(--hv-scale));
+      height: calc(190px * var(--hv-scale));
+      border-radius: 50%;
+      border: var(--border-w) solid var(--ink);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      background: #fff;
+      z-index: 1;
+    }
+
+    .hero-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .vis-card {
+      position: absolute;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      padding: calc(20px * var(--hv-scale));
+      width: calc(220px * var(--hv-scale));
+      box-shadow: var(--shadow-xl);
+      z-index: 2;
+    }
+
+    .vis-card-1 {
+      top: 0;
+      left: calc(96px * var(--hv-scale));
+      transform: rotate(3deg);
+      background: var(--lemon);
+    }
+
+    .vis-card-2 {
+      top: calc(90px * var(--hv-scale));
+      left: calc(38px * var(--hv-scale));
+      transform: rotate(-4deg);
+      background: var(--lilac);
+    }
+
+    .vis-card-3 {
+      top: calc(180px * var(--hv-scale));
+      left: calc(150px * var(--hv-scale));
+      transform: rotate(2deg);
+      background: var(--sky);
+    }
+
+    .vis-card .vc-label {
+      font-size: calc(9px * var(--hv-scale));
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      opacity: 0.45;
+      margin-bottom: calc(6px * var(--hv-scale));
+      font-family: var(--mono);
+    }
+
+    .vis-card .vc-title {
+      font-size: calc(15px * var(--hv-scale));
+      font-weight: 800;
+      margin-bottom: calc(10px * var(--hv-scale));
+      line-height: 1.25;
+    }
+
+    .vis-card .vc-bar {
+      height: calc(6px * var(--hv-scale));
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: calc(3px * var(--hv-scale));
+      border: 1.5px solid var(--ink);
+      overflow: hidden;
+      margin-bottom: calc(5px * var(--hv-scale));
+    }
+
+    .vis-card .vc-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: var(--ink);
+      animation: fillBar 1.8s ease forwards;
+    }
+
+    @keyframes fillBar {
+      from {
+        width: 0
+      }
+    }
+
+    /* Section wrapper */
+    .section-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: var(--content-max);
+      margin: 0 auto;
+      padding: 80px var(--page-gutter);
+    }
+
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+      opacity: 0.4;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-family: var(--display);
+      font-size: clamp(34px, 5vw, 56px);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      margin-bottom: 48px;
+    }
+
+    .section-title span {
+      display: inline-block;
+      position: relative;
+    }
+
+    .section-title span::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      left: 0;
+      right: 0;
+      height: 8px;
+      z-index: -1;
+      border-radius: 4px;
+    }
+
+    .ul-coral span::after {
+      background: var(--coral);
+      opacity: 0.4;
+    }
+
+    .ul-mint span::after {
+      background: var(--mint);
+      opacity: 0.5;
+    }
+
+    .ul-sky span::after {
+      background: var(--sky);
+      opacity: 0.5;
+    }
+
+    .ul-lemon span::after {
+      background: var(--lemon);
+      opacity: 0.85;
+    }
+
+    /* Stripe band */
+    .stripe-band {
+      background: repeating-linear-gradient(-45deg, var(--lemon), var(--lemon) 12px, var(--ink) 12px, var(--ink) 14px);
+      height: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stripe-band.full-bleed {
+      width: 100vw;
+      margin-left: calc(50% - 50vw);
+      margin-top: 26px;
+    }
+
+    /* Skills */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .skill-card {
+      background: #fff;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      transition: transform 0.15s, box-shadow 0.15s;
+      cursor: none;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .skill-card:hover {
+      transform: translate(-3px, -3px);
+      box-shadow: var(--shadow-xl);
+    }
+
+    .skill-card.skill-pop {
+      animation: skillCardPop 0.5s cubic-bezier(.34, 1.56, .64, 1);
+    }
+
+    .skill-card.skill-pop .sc-icon {
+      display: inline-block;
+      animation: skillIconPop 0.5s cubic-bezier(.34, 1.56, .64, 1);
+    }
+
+    @keyframes skillCardPop {
+      0% { transform: translate(-3px, -3px) scale(1); }
+      18% { transform: translate(2px, 2px) scale(0.96); box-shadow: var(--shadow); }
+      50% { transform: translate(-6px, -6px) scale(1.04); box-shadow: 10px 10px 0 var(--ink); }
+      100% { transform: translate(-3px, -3px) scale(1); box-shadow: var(--shadow-xl); }
+    }
+
+    @keyframes skillIconPop {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      30% { transform: scale(1.4) rotate(-14deg); }
+      60% { transform: scale(1.2) rotate(10deg); }
+    }
+
+    .skill-sparkle {
+      position: fixed;
+      z-index: 9999;
+      pointer-events: none;
+      font-size: 13px;
+      line-height: 1;
+      color: var(--ink);
+      animation: skillSparkleFly 0.65s ease-out forwards;
+    }
+
+    @keyframes skillSparkleFly {
+      0% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+      100% { opacity: 0; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.2) rotate(160deg); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .skill-card.skill-pop,
+      .skill-card.skill-pop .sc-icon {
+        animation: none;
+      }
+
+      .skill-sparkle {
+        display: none;
+      }
+    }
+
+    .skill-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+    }
+
+    .sc-1::before {
+      background: var(--coral);
+    }
+
+    .sc-2::before {
+      background: var(--sky);
+    }
+
+    .sc-3::before {
+      background: var(--mint);
+    }
+
+    .sc-4::before {
+      background: var(--lilac);
+    }
+
+    .sc-5::before {
+      background: var(--lemon);
+      border-bottom: 1.5px solid var(--ink);
+    }
+
+    .sc-6::before {
+      background: var(--peach);
+    }
+
+    .skill-card .sc-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .skill-card .sc-title {
+      font-family: var(--display);
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .skill-card .sc-desc {
+      font-size: 13px;
+      line-height: 1.65;
+      opacity: 0.6;
+      margin-bottom: 16px;
+    }
+
+    .skill-card .sc-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tool-chip {
+      font-family: var(--mono);
+      font-size: 10px;
+      padding: 3px 9px;
+      border-radius: 6px;
+      border: 1.5px solid var(--ink);
+      background: var(--cream);
+    }
+
+    .sc-xp {
+      margin-top: auto;
+      padding-top: 16px;
+    }
+
+    .sc-xp-track {
+      height: 8px;
+      background: rgba(0, 0, 0, 0.06);
+      border-radius: 4px;
+      border: 1.5px solid var(--ink);
+      overflow: hidden;
+    }
+
+    .sc-xp-fill {
+      height: 100%;
+      border-radius: 2px;
+      width: 100%;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 3.2s cubic-bezier(.22, 1, .36, 1);
+    }
+
+    .sc-1 .sc-xp-fill {
+      background: var(--coral);
+    }
+
+    .sc-2 .sc-xp-fill {
+      background: var(--sky);
+    }
+
+    .sc-3 .sc-xp-fill {
+      background: var(--mint);
+    }
+
+    .sc-4 .sc-xp-fill {
+      background: var(--lilac);
+    }
+
+    .sc-5 .sc-xp-fill {
+      background: var(--lemon);
+    }
+
+    .sc-6 .sc-xp-fill {
+      background: var(--peach);
+    }
+
+    /* Skill modal */
+    .skill-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .skill-modal.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .skill-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(26, 18, 7, 0.55);
+    }
+
+    .skill-modal-dialog {
+      position: relative;
+      z-index: 1;
+      width: min(440px, 100%);
+      transform: translateY(12px) scale(0.96);
+      transition: transform 0.22s cubic-bezier(.34, 1.56, .64, 1);
+    }
+
+    .skill-modal.open .skill-modal-dialog {
+      transform: none;
+    }
+
+    .skill-modal-close {
+      position: absolute;
+      top: -14px;
+      right: -14px;
+      z-index: 2;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: var(--border-w) solid var(--ink);
+      background: var(--lemon);
+      color: var(--ink);
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1;
+      box-shadow: var(--shadow);
+      cursor: none;
+      display: grid;
+      place-items: center;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .skill-modal-close:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .skill-modal-card {
+      background: #fff;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: var(--shadow-xl);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .skill-modal-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+    }
+
+    .skill-modal-card.sc-1::before { background: var(--coral); }
+    .skill-modal-card.sc-2::before { background: var(--sky); }
+    .skill-modal-card.sc-3::before { background: var(--mint); }
+    .skill-modal-card.sc-4::before { background: var(--lilac); }
+    .skill-modal-card.sc-5::before { background: var(--lemon); border-bottom: 1.5px solid var(--ink); }
+    .skill-modal-card.sc-6::before { background: var(--peach); }
+
+    .skill-modal-card .sc-icon {
+      font-size: 40px;
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .skill-modal-card .sc-title {
+      font-family: var(--display);
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .skill-modal-card .sc-desc {
+      font-size: 15px;
+      line-height: 1.65;
+      opacity: 0.65;
+      margin-bottom: 18px;
+    }
+
+    .skill-modal-card .sc-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+
+    .skill-modal-card .sc-xp-track {
+      height: 10px;
+      background: rgba(0, 0, 0, 0.06);
+      border-radius: 4px;
+      border: 1.5px solid var(--ink);
+      overflow: hidden;
+    }
+
+    .skill-modal-card .sc-xp-fill {
+      height: 100%;
+      width: 100%;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.9s cubic-bezier(.22, 1, .36, 1);
+    }
+
+    .skill-modal-card.sc-1 .sc-xp-fill { background: var(--coral); }
+    .skill-modal-card.sc-2 .sc-xp-fill { background: var(--sky); }
+    .skill-modal-card.sc-3 .sc-xp-fill { background: var(--mint); }
+    .skill-modal-card.sc-4 .sc-xp-fill { background: var(--lilac); }
+    .skill-modal-card.sc-5 .sc-xp-fill { background: var(--lemon); }
+    .skill-modal-card.sc-6 .sc-xp-fill { background: var(--peach); }
+
+    .skill-modal-card.is-ready .sc-xp-fill {
+      transform: scaleX(1);
+    }
+
+    body.skill-modal-open {
+      overflow: hidden;
+    }
+
+    .htag[aria-pressed="true"] {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0 var(--ink);
+    }
+
+    .reveal.in .sc-xp-fill {
+      transform: scaleX(1);
+    }
+
+    /* Projects */
+    .projects-list {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .project-card {
+      background: #fff;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: transform 0.15s, box-shadow 0.15s;
+      cursor: none;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .project-card:hover {
+      transform: translate(-3px, -3px);
+      box-shadow: var(--shadow-xl);
+    }
+
+    .pc-top {
+      display: flex;
+      gap: 28px;
+      padding: 32px;
+      align-items: flex-start;
+    }
+
+    .pc-emoji {
+      font-size: 40px;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      border: var(--border-w) solid var(--ink);
+      box-shadow: var(--shadow);
+      flex-shrink: 0;
+      background: var(--cream);
+      transition: transform 0.3s cubic-bezier(.34, 1.56, .64, 1);
+    }
+
+    .pc-emoji img {
+      width: 70%;
+      height: 70%;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+    }
+
+    .project-card:hover .pc-emoji {
+      transform: rotate(-8deg) scale(1.1);
+    }
+
+    .pc-info {
+      flex: 1;
+    }
+
+    .pc-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 10px;
+    }
+
+    .pc-title {
+      font-family: var(--display);
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .pc-xp-badge {
+      background: var(--lemon);
+      border: var(--border-w) solid var(--ink);
+      border-radius: 8px;
+      padding: 4px 12px;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      box-shadow: 2px 2px 0 var(--ink);
+      cursor: pointer;
+      color: var(--ink);
+      transition: transform 0.15s, background 0.15s, color 0.15s, box-shadow 0.15s, opacity 0.2s;
+    }
+
+    .pc-xp-badge:hover:not(:disabled) {
+      transform: translate(-1px, -1px);
+      background: var(--coral);
+      color: #fff;
+      box-shadow: 3px 3px 0 var(--ink);
+    }
+
+    .pc-xp-badge:active:not(:disabled) {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0 var(--ink);
+    }
+
+    .pc-xp-badge.claiming {
+      pointer-events: none;
+      animation: xpBadgePop 0.35s ease;
+    }
+
+    .pc-xp-badge.collected {
+      opacity: 0.45;
+      cursor: default;
+      background: #fff;
+      color: var(--ink);
+      box-shadow: none;
+      transform: none;
+    }
+
+    @keyframes xpBadgePop {
+      0% { transform: scale(1); }
+      45% { transform: scale(1.12); }
+      100% { transform: scale(1); }
+    }
+
+    .xp-fly-orb {
+      position: fixed;
+      z-index: 10000;
+      pointer-events: none;
+      font-family: var(--mono);
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 1;
+      background: var(--lemon);
+      color: var(--ink);
+      border: var(--border-w) solid var(--ink);
+      border-radius: 999px;
+      padding: 5px 10px;
+      box-shadow: 2px 2px 0 var(--ink);
+      left: 0;
+      top: 0;
+      will-change: transform, opacity;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .nav-score.xp-bump,
+      .pc-xp-badge.claiming {
+        animation: none;
+      }
+
+      .xp-fly-orb {
+        display: none;
+      }
+    }
+
+    .pc-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .pc-project-type {
+      font-family: var(--mono);
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink);
+      opacity: 0.5;
+      white-space: nowrap;
+    }
+
+    .pc-desc {
+      font-size: 14px;
+      line-height: 1.65;
+      opacity: 0.6;
+      margin-bottom: 14px;
+      max-width: 560px;
+    }
+
+    .pc-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .pc-tag {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1.5px solid var(--ink);
+    }
+
+    .pct-ux {
+      background: var(--coral);
+      color: #fff;
+    }
+
+    .pct-dev {
+      background: var(--sky);
+    }
+
+    .pct-ds {
+      background: var(--rose);
+    }
+
+    .pct-res {
+      background: var(--mint);
+    }
+
+    .pct-test {
+      background: var(--lemon);
+    }
+
+    .pct-figma {
+      background: var(--lilac);
+    }
+
+    .pct-react {
+      background: var(--sky);
+    }
+
+    .pct-claude {
+      background: var(--peach);
+    }
+
+    .pct-js {
+      background: #f7df1e;
+    }
+
+    .pct-html {
+      background: #ff9f7a;
+    }
+
+    .pct-next {
+      background: #9ad7ff;
+    }
+
+    .pct-type {
+      background: #f6a6d9;
+    }
+
+    .pc-expand-btn {
+      margin-top: 16px;
+      background: #fff;
+      border: var(--border-w) solid var(--ink);
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 800;
+      cursor: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--ink);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+      white-space: nowrap;
+      width: fit-content;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .pc-expand-btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .pc-expand-btn:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0 var(--ink);
+    }
+
+    .pc-expand-btn[aria-busy="true"] {
+      opacity: 0.75;
+      pointer-events: none;
+    }
+
+    .pc-chevron {
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .pc-details {
+      display: none;
+      padding: 28px 32px;
+      border-top: var(--border-w) dashed rgba(0, 0, 0, 0.1);
+      background: var(--cream);
+    }
+
+    .pc-details.open {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      animation: openDown 0.3s ease;
+    }
+
+    @keyframes openDown {
+      from {
+        opacity: 0;
+        transform: translateY(-8px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .pcd-block {
+      background: #fff;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      box-shadow: 3px 3px 0 var(--ink);
+    }
+
+    .pcd-label {
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      opacity: 0.4;
+      margin-bottom: 6px;
+      font-family: var(--mono);
+    }
+
+    .pcd-value {
+      font-size: 13px;
+      line-height: 1.55;
+      font-weight: 600;
+    }
+
+    /* Vibe / Cassette player */
+    .vibe-deck {
+      display: grid;
+      gap: 28px;
+      background: #fff;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      padding: 28px;
+    }
+
+    .vibe-stage {
+      display: grid;
+      grid-template-columns: minmax(260px, 380px) 1fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .cassette-deck {
+      --walkman: #3d463d;
+      --walkman-deep: #2b322b;
+      --walkman-accent: #ff5c39;
+      position: relative;
+      background: linear-gradient(165deg, #4a534a 0%, var(--walkman) 45%, var(--walkman-deep) 100%);
+      border: var(--border-w) solid var(--ink);
+      border-radius: 22px;
+      box-shadow: var(--shadow-lg);
+      padding: 14px 14px 16px;
+      overflow: hidden;
+    }
+
+    .walkman-top {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .walkman-top .vibe-btn {
+      flex: 1 1 0;
+      justify-content: center;
+      min-width: 0;
+      padding: 10px 6px;
+      border-radius: 8px;
+      background: #1a1207;
+      color: #fdf8f0;
+      font-size: 11px;
+      box-shadow: 2px 2px 0 rgba(0,0,0,0.35);
+    }
+
+    .walkman-top .vibe-btn:disabled {
+      opacity: 0.45;
+    }
+
+    .walkman-top .vibe-btn-play {
+      background: var(--walkman-accent);
+      color: #fff;
+      flex: 1.35 1 0;
+    }
+
+    .walkman-top #vibePlayLabel {
+      display: none;
+    }
+
+    @media (min-width: 420px) {
+      .walkman-top #vibePlayLabel {
+        display: inline;
+      }
+    }
+
+    .walkman-top .vibe-btn-eject {
+      background: #1a1207;
+      color: var(--lemon);
+    }
+
+    .cassette-slot {
+      position: relative;
+      min-height: 200px;
+      border: 10px solid #111;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #1c1c1c, #0d0d0d);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      transition: box-shadow 0.2s, border-color 0.2s;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+    }
+
+    .cassette-slot.is-drop-target {
+      border-color: var(--walkman-accent);
+      box-shadow: inset 0 0 0 2px var(--lemon), 0 0 0 2px var(--walkman-accent);
+    }
+
+    .cassette-slot-empty {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(253,248,240,0.45);
+      text-align: center;
+      padding: 16px;
+      transition: opacity 0.25s;
+    }
+
+    .vibe-deck.has-tape .cassette-slot-empty {
+      opacity: 0;
+      pointer-events: none;
+      position: absolute;
+    }
+
+    .deck-cassette {
+      width: min(92%, 300px);
+      aspect-ratio: 1.62 / 1;
+      border: 2px solid rgba(26,18,7,0.55);
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.28), rgba(255,255,255,0.08)),
+        repeating-linear-gradient(
+          180deg,
+          transparent 0 10px,
+          rgba(90,90,90,0.18) 10px 14px
+        ),
+        rgba(220, 220, 220, 0.55);
+      backdrop-filter: blur(1px);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.35);
+      position: relative;
+      padding: 12px 14px 10px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 8px;
+      opacity: 0;
+      transform: translateY(-120%) rotate(-4deg) scale(0.92);
+      transition: transform 0.45s cubic-bezier(.34,1.3,.64,1), opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .vibe-deck.has-tape .deck-cassette {
+      opacity: 1;
+      transform: translateY(0) rotate(0) scale(1);
+    }
+
+    .vibe-deck.is-ejecting .deck-cassette {
+      transform: translateY(-130%) rotate(3deg) scale(0.94);
+      opacity: 0;
+    }
+
+    .deck-cassette-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-align: center;
+      color: #1a1207;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid rgba(26,18,7,0.35);
+      border-radius: 4px;
+      padding: 4px 8px;
+      width: fit-content;
+      justify-self: start;
+    }
+
+    .deck-cassette-window {
+      border: 1.5px solid rgba(26,18,7,0.35);
+      border-radius: 6px;
+      background: rgba(245,245,245,0.35);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      place-items: center;
+      padding: 12px 22px;
+      position: relative;
+    }
+
+    .deck-cassette-window::before,
+    .deck-cassette-window::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 18px;
+      height: 10px;
+      border: 1.5px solid rgba(26,18,7,0.35);
+      border-radius: 2px;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.35);
+    }
+
+    .deck-cassette-window::before { left: calc(50% - 28px); }
+    .deck-cassette-window::after { left: calc(50% + 10px); }
+
+    .cassette-reel {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      border: 2px solid #1a1207;
+      background:
+        radial-gradient(circle at 50% 50%, #1a1207 0 10%, transparent 11%),
+        repeating-conic-gradient(from 0deg, #1a1207 0 8deg, #3a3128 8deg 16deg);
+      box-shadow:
+        inset 0 0 0 7px rgba(120, 72, 36, 0.85),
+        inset 0 0 0 14px rgba(90, 55, 28, 0.55),
+        0 2px 4px rgba(0,0,0,0.25);
+      position: relative;
+      z-index: 1;
+    }
+
+    .cassette-reel.reel-right {
+      box-shadow:
+        inset 0 0 0 4px rgba(120, 72, 36, 0.45),
+        inset 0 0 0 10px rgba(90, 55, 28, 0.25),
+        0 2px 4px rgba(0,0,0,0.25);
+    }
+
+    .vibe-deck.is-playing .cassette-reel {
+      animation: reelSpin 1.15s linear infinite;
+    }
+
+    .vibe-deck.is-playing .cassette-reel.reel-right {
+      animation-duration: 0.95s;
+      animation-direction: reverse;
+    }
+
+    .deck-cassette-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(26,18,7,0.7);
+    }
+
+    .vibe-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .vibe-now {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .vibe-now-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.45;
+    }
+
+    .vibe-now-title {
+      font-family: var(--display);
+      font-size: clamp(24px, 3vw, 34px);
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .vibe-now-meta {
+      font-size: 14px;
+      opacity: 0.55;
+    }
+
+    .vibe-transport {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .vibe-btn {
+      font-family: var(--sans);
+      font-weight: 800;
+      font-size: 13px;
+      padding: 12px 18px;
+      border-radius: 12px;
+      border: var(--border-w) solid var(--ink);
+      background: #fff;
+      color: var(--ink);
+      box-shadow: var(--shadow);
+      cursor: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .vibe-btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .vibe-btn:active,
+    .vibe-btn[aria-pressed="true"] {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0 var(--ink);
+    }
+
+    .vibe-btn-play {
+      background: var(--ink);
+      color: var(--lemon);
+    }
+
+    .vibe-btn-eject {
+      background: var(--lemon);
+    }
+
+    .vibe-progress {
+      height: 10px;
+      border: var(--border-w) solid var(--ink);
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+    }
+
+    .vibe-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--vibe-color, var(--coral));
+      transition: width 0.1s linear;
+    }
+
+    .vibe-credit {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      opacity: 0.4;
+    }
+
+    .tape-rack-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.45;
+      margin-bottom: 10px;
+    }
+
+    .tape-rack {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .tape-card {
+      appearance: none;
+      border: var(--border-w) solid var(--ink);
+      border-radius: 12px;
+      background: var(--vibe-color, var(--cream));
+      box-shadow: var(--shadow);
+      padding: 10px;
+      cursor: grab;
+      text-align: left;
+      color: var(--ink);
+      display: grid;
+      gap: 8px;
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.25s;
+      min-height: 118px;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .tape-card:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .tape-card.is-dragging {
+      opacity: 0.35;
+      cursor: grabbing;
+    }
+
+    .tape-card.is-loaded {
+      outline: 3px solid var(--ink);
+      outline-offset: 2px;
+      opacity: 0.55;
+    }
+
+    .tape-drag-ghost {
+      position: fixed;
+      z-index: 9999;
+      width: 150px;
+      pointer-events: none;
+      border: var(--border-w) solid var(--ink);
+      border-radius: 12px;
+      background: var(--vibe-color, var(--coral));
+      box-shadow: 8px 8px 0 var(--ink);
+      padding: 10px;
+      transform: rotate(-6deg);
+      opacity: 0.95;
+    }
+
+    .tape-drag-ghost .tape-card-shell {
+      min-height: 40px;
+    }
+
+    .tape-drag-ghost .tape-card-title {
+      font-size: 14px;
+    }
+
+    .tape-drag-ghost .tape-card-action {
+      display: none;
+    }
+
+    .tape-card-shell {
+      border: 2px solid rgba(26,18,7,0.55);
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.2)),
+        repeating-linear-gradient(180deg, transparent 0 7px, rgba(90,90,90,0.16) 7px 10px);
+      padding: 8px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      place-items: center;
+      min-height: 52px;
+    }
+
+    .tape-card-shell span {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--ink);
+      background:
+        radial-gradient(circle at 50% 50%, #1a1207 0 18%, transparent 19%),
+        repeating-conic-gradient(from 0deg, #1a1207 0 10deg, #6b4a2e 10deg 20deg);
+    }
+
+    .tape-card-title {
+      font-family: var(--display);
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .tape-card-meta {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      opacity: 0.65;
+    }
+
+    .tape-card-action {
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    @keyframes reelSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 900px) {
+      .vibe-stage {
+        grid-template-columns: 1fr;
+      }
+
+      .tape-rack {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 520px) {
+      .tape-rack {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .vibe-deck.is-playing .cassette-reel,
+      .deck-cassette {
+        animation: none !important;
+        transition: none !important;
+      }
+
+      .vibe-deck.has-tape .deck-cassette {
+        transform: none;
+      }
+    }
+
+    /* Achievements */
+    .ach-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
+    }
+
+    .ach-card {
+      background: #fff;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      padding: 24px 20px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      transition: transform 0.15s, box-shadow 0.15s;
+      cursor: none;
+      position: relative;
+    }
+
+    .ach-card:not(.locked):hover {
+      transform: translate(-3px, -3px) rotate(-1.5deg);
+      box-shadow: var(--shadow-xl);
+    }
+
+    .ach-card.locked {
+      opacity: 0.28;
+      filter: grayscale(1);
+    }
+
+    .ach-icon {
+      font-size: 36px;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .ach-name {
+      font-family: var(--display);
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .ach-desc {
+      font-size: 11px;
+      opacity: 0.5;
+      line-height: 1.4;
+      font-weight: 600;
+    }
+
+    .ach-rarity {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-family: var(--mono);
+      font-size: 8px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .r-legendary {
+      background: var(--lemon);
+      border: 1.5px solid var(--ink);
+    }
+
+    .r-epic {
+      background: var(--lilac);
+      border: 1.5px solid var(--ink);
+    }
+
+    .r-rare {
+      background: var(--sky);
+      border: 1.5px solid var(--ink);
+    }
+
+    /* About */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      position: relative;
+    }
+
+    @media(max-width:700px) {
+      .about-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .about-blurb {
+      background: var(--lemon);
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      padding: 36px;
+      box-shadow: var(--shadow-xl);
+    }
+
+    .about-blurb p {
+      font-family: var(--display);
+      font-size: 19px;
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.65;
+      margin-bottom: 18px;
+    }
+
+    .about-blurb p:last-child {
+      margin-bottom: 0;
+    }
+
+    .about-blurb p strong {
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    .about-photo {
+      position: absolute;
+      top: -16px;
+      left: calc(50% - 100px);
+      width: 144px;
+      height: 144px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: var(--border-w) solid var(--ink);
+      box-shadow: var(--shadow-lg);
+      z-index: 4;
+      background: #fff;
+    }
+
+    .about-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    @media(max-width:900px) {
+      .about-photo {
+        width: 124px;
+        height: 124px;
+        left: calc(50% - 62px);
+      }
+    }
+
+    @media(max-width:700px) {
+      .about-photo {
+        position: static;
+        margin: 0 auto 12px;
+      }
+    }
+
+    .about-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-self: end;
+    }
+
+    .astat {
+      background: #fff;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius-sm);
+      padding: 20px 24px;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: transform 0.15s, box-shadow 0.15s;
+      cursor: none;
+    }
+
+    .astat:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .astat-num {
+      font-family: var(--display);
+      font-size: 36px;
+      font-weight: 900;
+      line-height: 1;
+      min-width: 70px;
+    }
+
+    .astat-text {
+      font-size: 13px;
+      font-weight: 700;
+      opacity: 0.6;
+      line-height: 1.4;
+    }
+
+    /* Contact */
+    .contact-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .contact-card {
+      background: #fff;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      padding: 24px;
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: var(--ink);
+      box-shadow: var(--shadow);
+      transition: transform 0.15s, box-shadow 0.15s;
+      cursor: none;
+      width: fit-content;
+      max-width: 100%;
+      min-width: 280px;
+      flex: 0 1 auto;
+    }
+
+    .contact-card:hover {
+      transform: translate(-3px, -3px);
+      box-shadow: var(--shadow-xl);
+    }
+
+    .cc-icon {
+      font-size: 22px;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: var(--border-w) solid var(--ink);
+      border-radius: 10px;
+      flex-shrink: 0;
+    }
+
+    .cc-label {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.4;
+      margin-bottom: 2px;
+      font-family: var(--mono);
+    }
+
+    .cc-value {
+      font-size: 14px;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .cc-1 .cc-icon {
+      background: var(--coral);
+    }
+
+    .cc-2 .cc-icon {
+      background: var(--sky);
+    }
+
+    .cc-3 .cc-icon {
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .cc-4 .cc-icon {
+      background: var(--rose);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: var(--ink);
+      color: var(--lemon);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 800;
+      transform: translateY(100px) rotate(2deg);
+      opacity: 0;
+      transition: all 0.5s cubic-bezier(.34, 1.56, .64, 1);
+      box-shadow: var(--shadow-xl);
+      border: var(--border-w) solid var(--ink);
+      max-width: 300px;
+    }
+
+    .toast.show {
+      transform: translateY(0) rotate(0deg);
+      opacity: 1;
+    }
+
+    .toast-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+
+    .toast-title {
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 2px;
+    }
+
+    .toast-sub {
+      font-size: 11px;
+      opacity: 0.65;
+      font-weight: 600;
+      color: var(--cream);
+    }
+
+    /* Agent guide — cursor overrides for custom cursor page */
+    .agent-orb,
+    .agent-close,
+    .agent-preset,
+    .agent-chip,
+    .agent-next {
+      cursor: none;
+    }
+
+    /* Large desktop */
+    @media (min-width: 1280px) {
+      :root { --content-max: 1280px; }
+
+      .hero { gap: 72px; }
+      .hero-role { max-width: 520px; font-size: 18px; }
+      .hero-visual { --hv-scale: 1.07; }
+      .skills-grid { gap: 24px; grid-template-columns: repeat(3, 1fr); }
+      .ach-grid { gap: 20px; }
+      .section-title { margin-bottom: 56px; }
+      .pc-desc { max-width: 640px; font-size: 15px; }
+      .about-grid { gap: 32px; }
+    }
+
+    @media (min-width: 1440px) {
+      :root { --content-max: 1360px; }
+
+      .hero { gap: 88px; }
+      .hero-visual { --hv-scale: 1.14; }
+      .ach-grid { grid-template-columns: repeat(5, 1fr); }
+      .about-blurb { padding: 40px; }
+      .about-blurb p { font-size: 20px; }
+      .pc-top { padding: 36px; gap: 32px; }
+    }
+
+    @media (min-width: 1680px) {
+      :root { --content-max: 1480px; }
+
+      .hero { max-width: 1800px; }
+      .hero-name { font-size: clamp(72px, 5.5vw, 108px); }
+      .hero-role { max-width: 560px; }
+      .hero-visual { --hv-scale: 1.29; }
+      .section-wrap { padding-top: 96px; padding-bottom: 96px; }
+      .skill-card { padding: 32px; }
+      .skill-card .sc-title { font-size: 22px; }
+      .pc-title { font-size: 26px; }
+    }
+
+    @media (min-width: 1920px) {
+      :root { --content-max: 1560px; }
+
+      nav { padding-top: 18px; padding-bottom: 16px; }
+      .nav-links a { font-size: 14px; padding: 7px 16px; }
+      .hero {
+        gap: 110px;
+        padding-top: 130px;
+        max-width: 1900px;
+      }
+      .hero-visual { --hv-scale: 1.52; }
+      .hero-name { font-size: clamp(80px, 5vw, 112px); }
+      .hero-role { max-width: 600px; font-size: 19px; }
+      .section-title { font-size: clamp(40px, 3.2vw, 64px); }
+      .contact-grid { gap: 20px; }
+    }
+
+    /* Footer */
+    footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 40px;
+      border-top: var(--border-w) solid var(--ink);
+      font-size: 13px;
+      font-weight: 700;
+      opacity: 0.38;
+      font-family: var(--mono);
+    }
+
+    /* Bonus game */
+    .bonus-game {
+      position: relative;
+      z-index: 1;
+      max-width: var(--content-max);
+      margin: 0 auto;
+      padding: 20px var(--page-gutter) 80px;
+      opacity: 0;
+      transform: translateY(28px);
+      pointer-events: none;
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+
+    .bonus-game.is-unlocked {
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+    }
+
+    .dino-boot {
+      display: grid;
+      place-items: center;
+      min-height: 180px;
+      padding: 28px;
+    }
+
+    .dino-boot[hidden] {
+      display: none;
+    }
+
+    .dino-spinner {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 4px solid rgba(26, 18, 7, 0.15);
+      border-top-color: var(--coral);
+      animation: dinoSpin 0.75s linear infinite;
+    }
+
+    @keyframes dinoSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    .dino-game-content {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+
+    .dino-game-content.is-ready {
+      opacity: 1;
+      transform: none;
+    }
+
+    .dino-game-content[hidden] {
+      display: none;
+    }
+
+    .bonus-game-frame {
+      position: relative;
+    }
+
+    .bonus-game-shell {
+      background: #fff;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-xl);
+      overflow: hidden;
+      transition: filter 0.35s ease, opacity 0.35s ease;
+    }
+
+    .bonus-game-frame.is-locked .bonus-game-shell {
+      filter: grayscale(1);
+      opacity: 0.55;
+    }
+
+    .dino-lock-modal {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: rgba(26, 18, 7, 0.22);
+      border-radius: var(--radius);
+    }
+
+    .dino-lock-modal[hidden] {
+      display: none;
+    }
+
+    .dino-lock-card {
+      max-width: 360px;
+      width: 100%;
+      background: #fff;
+      border: var(--border-w) solid var(--ink);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-xl);
+      padding: 28px 24px;
+      text-align: center;
+    }
+
+    .dino-lock-card h3 {
+      font-family: var(--display);
+      font-size: clamp(22px, 3vw, 28px);
+      font-weight: 900;
+      line-height: 1.15;
+      margin: 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .dino-spinner {
+        animation: none;
+        border-top-color: var(--ink);
+        opacity: 0.7;
+      }
+
+      .dino-game-content {
+        transition: none;
+      }
+
+      .bonus-game-shell {
+        transition: none;
+      }
+    }
+
+    .bonus-game-hud {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 14px 18px;
+      border-bottom: var(--border-w) solid var(--ink);
+      background: var(--cream);
+    }
+
+    .bonus-game-stat {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bonus-game-stat strong {
+      background: var(--ink);
+      color: var(--lemon);
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1.5px solid var(--ink);
+    }
+
+    .bonus-game-stage {
+      position: relative;
+      background: #fff;
+      min-height: 220px;
+    }
+
+    #dinoGameCanvas {
+      display: block;
+      width: 100%;
+      height: 220px;
+      cursor: pointer;
+      touch-action: none;
+      background: #fff;
+    }
+
+    .bonus-game-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 24px;
+      text-align: center;
+      background: rgba(253, 248, 240, 0.88);
+      transition: opacity 0.2s ease;
+    }
+
+    .bonus-game-overlay[hidden] {
+      display: none;
+    }
+
+    .bonus-game-overlay h3 {
+      font-family: var(--display);
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .bonus-game-overlay p {
+      max-width: 360px;
+      font-size: 14px;
+      line-height: 1.5;
+      opacity: 0.65;
+    }
+
+    .bonus-game-tip {
+      margin-top: 10px;
+      font-family: var(--mono);
+      font-size: 11px;
+      opacity: 0.45;
+      text-align: center;
+    }
+
+    @media (max-width: 820px) {
+      #dinoGameCanvas {
+        height: 200px;
+      }
+    }
+
+    /* Reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+
+    .reveal.in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── LOADER ── */
+    #loader {
+      position: fixed;
+      inset: 0;
+      z-index: 9990;
+      background: var(--ink);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      overflow: hidden;
+      transition: opacity 0.6s ease, transform 0.6s cubic-bezier(.76, 0, .24, 1);
+    }
+
+    #loader.hide {
+      opacity: 0;
+      transform: translateY(-100%);
+      pointer-events: none;
+    }
+
+    /* scanlines on loader */
+    #loader::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255, 255, 255, 0.015) 3px, rgba(255, 255, 255, 0.015) 4px);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* corner decorations */
+    .ld-corner {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      border-color: var(--lemon);
+      border-style: solid;
+      opacity: 0;
+      animation: cornerFade 0.4s ease 0.2s forwards;
+    }
+
+    .ld-corner-tl {
+      top: 28px;
+      left: 28px;
+      border-width: 3px 0 0 3px;
+    }
+
+    .ld-corner-tr {
+      top: 28px;
+      right: 28px;
+      border-width: 3px 3px 0 0;
+    }
+
+    .ld-corner-bl {
+      bottom: 28px;
+      left: 28px;
+      border-width: 0 0 3px 3px;
+    }
+
+    .ld-corner-br {
+      bottom: 28px;
+      right: 28px;
+      border-width: 0 3px 3px 0;
+    }
+
+    @keyframes cornerFade {
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* main loader content */
+    .ld-inner {
+      position: relative;
+      z-index: 2;
+      width: min(520px, 90vw);
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* logo mark */
+    .ld-logo {
+      font-family: var(--display);
+      font-size: 13px;
+      font-style: italic;
+      color: var(--lemon);
+      opacity: 0;
+      letter-spacing: 0.06em;
+      margin-bottom: 40px;
+      text-align: center;
+      animation: ldFadeUp 0.5s ease 0.3s forwards;
+    }
+
+    .ld-logo span {
+      color: rgba(255, 225, 69, 0.4);
+    }
+
+    /* big title */
+    .ld-title {
+      font-family: var(--mono);
+      font-size: clamp(11px, 1.5vw, 13px);
+      color: rgba(255, 225, 69, 0.35);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      opacity: 0;
+      animation: ldFadeUp 0.4s ease 0.5s forwards;
+    }
+
+    .ld-name {
+      font-family: var(--display);
+      font-size: clamp(42px, 8vw, 72px);
+      font-weight: 900;
+      color: var(--cream);
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: ldFadeUp 0.5s cubic-bezier(.16, 1, .3, 1) 0.65s forwards;
+    }
+
+    .ld-name em {
+      font-style: italic;
+      color: var(--lemon);
+    }
+
+    @keyframes ldFadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* boot log */
+    .ld-log {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.35);
+      line-height: 1.9;
+      margin-bottom: 24px;
+      min-height: 88px;
+    }
+
+    .ld-log-line {
+      opacity: 0;
+      transform: translateX(-6px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .ld-log-line.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .ld-log-line .ok {
+      color: var(--mint);
+      margin-right: 10px;
+    }
+
+    .ld-log-line .warn {
+      color: var(--peach);
+      margin-right: 10px;
+    }
+
+    .ld-log-line .key {
+      color: var(--lemon);
+    }
+
+    .ld-log-text {
+      display: inline;
+    }
+
+    .ld-cursor {
+      display: inline-block;
+      color: var(--lemon);
+      font-size: 10px;
+      vertical-align: middle;
+      animation: cursorBlink 0.6s step-end infinite;
+      margin-left: 1px;
+    }
+
+    @keyframes cursorBlink {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0
+      }
+    }
+
+    /* stat bars */
+    .ld-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: ldFadeUp 0.4s ease 1s forwards;
+    }
+
+    .ld-stat-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .ld-stat-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.4);
+      width: 110px;
+      flex-shrink: 0;
+      letter-spacing: 0.05em;
+    }
+
+    .ld-stat-track {
+      flex: 1;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 3px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .ld-stat-fill {
+      height: 100%;
+      width: 0;
+      border-radius: 3px;
+      transition: width 0.9s cubic-bezier(.16, 1, .3, 1);
+    }
+
+    .ld-stat-val {
+      font-family: var(--mono);
+      font-size: 10px;
+      width: 28px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* progress bar area */
+    .ld-progress-wrap {
+      opacity: 0;
+      animation: ldFadeUp 0.4s ease 1.1s forwards;
+    }
+
+    .ld-progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.3);
+      margin-bottom: 8px;
+      letter-spacing: 0.08em;
+    }
+
+    .ld-progress-label .pct {
+      color: var(--lemon);
+      font-weight: 600;
+    }
+
+    .ld-bar-outer {
+      height: 14px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .ld-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--mint), var(--lemon), var(--coral));
+      background-size: 300% 100%;
+      border-radius: 3px;
+      transition: width 0.08s linear;
+      animation: barShimmer 2s linear infinite;
+    }
+
+    @keyframes barShimmer {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      100% {
+        background-position: 100% 50%;
+      }
+    }
+
+    /* block fill texture */
+    .ld-bar-fill::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(90deg, transparent, transparent 12px, rgba(0, 0, 0, 0.12) 12px, rgba(0, 0, 0, 0.12) 13px);
+    }
+
+    /* enter button */
+    .ld-enter {
+      margin-top: 28px;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .ld-enter.show {
+      opacity: 1;
+    }
+
+    .ld-enter-btn {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      background: var(--lemon);
+      color: var(--ink);
+      border: 2.5px solid var(--lemon);
+      border-radius: 8px;
+      padding: 14px 40px;
+      cursor: none;
+      box-shadow: 0 0 0 0 rgba(255, 225, 69, 0.4);
+      animation: btnPulse 1.6s ease-in-out infinite;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .ld-enter-btn:hover {
+      transform: scale(1.04);
+      box-shadow: 0 0 28px rgba(255, 225, 69, 0.35);
+    }
+
+    @keyframes btnPulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 225, 69, 0.4);
+      }
+
+      50% {
+        box-shadow: 0 0 0 10px rgba(255, 225, 69, 0);
+      }
+    }
+
+    .ld-enter-hint {
+      margin-top: 10px;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.2);
+      letter-spacing: 0.1em;
+      animation: blink 1.2s step-end infinite;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══ LOADER ══ -->
+  <div id="loader">
+    <div class="ld-corner ld-corner-tl"></div>
+    <div class="ld-corner ld-corner-tr"></div>
+    <div class="ld-corner ld-corner-bl"></div>
+    <div class="ld-corner ld-corner-br"></div>
+    <div class="ld-inner">
+      <div class="ld-logo">✦ <span>mckenna.portfolio</span></div>
+      <div class="ld-title">Initializing player profile</div>
+      <div class="ld-name">McKenna<br><em>Wilson</em></div>
+      <div class="ld-log" id="ldLog"></div>
+      <div class="ld-stats" id="ldStats">
+        <div class="ld-stat-row">
+          <div class="ld-stat-label">UI Design</div>
+          <div class="ld-stat-track">
+            <div class="ld-stat-fill" data-w="100" style="background:var(--coral)"></div>
+          </div>
+          <div class="ld-stat-val" style="color:var(--coral)">100%</div>
+        </div>
+        <div class="ld-stat-row">
+          <div class="ld-stat-label">UX Research</div>
+          <div class="ld-stat-track">
+            <div class="ld-stat-fill" data-w="100" style="background:var(--sky)"></div>
+          </div>
+          <div class="ld-stat-val" style="color:var(--sky)">100%</div>
+        </div>
+        <div class="ld-stat-row">
+          <div class="ld-stat-label"> HTML/ CSS/ JavaScript/ TypeScript/ React</div>
+          <div class="ld-stat-track">
+            <div class="ld-stat-fill" data-w="100" style="background:var(--mint)"></div>
+          </div>
+          <div class="ld-stat-val" style="color:var(--mint)">100%</div>
+        </div>
+        <div class="ld-stat-row">
+          <div class="ld-stat-label">Design Systems</div>
+          <div class="ld-stat-track">
+            <div class="ld-stat-fill" data-w="100" style="background:var(--lilac)"></div>
+          </div>
+          <div class="ld-stat-val" style="color:var(--lilac)">100%</div>
+        </div>
+        <div class="ld-stat-row">
+          <div class="ld-stat-label">Accessibility</div>
+          <div class="ld-stat-track">
+            <div class="ld-stat-fill" data-w="100" style="background:var(--peach)"></div>
+          </div>
+          <div class="ld-stat-val" style="color:var(--peach)">100%</div>
+        </div>
+      </div>
+      <div class="ld-progress-wrap" id="ldProgressWrap">
+        <div class="ld-progress-label">
+          <span>LOADING PORTFOLIO</span>
+          <span class="pct" id="ldPct">0%</span>
+        </div>
+        <div class="ld-bar-outer">
+          <div class="ld-bar-fill" id="ldBarFill"></div>
+        </div>
+      </div>
+      <div class="ld-enter" id="ldEnter">
+        <button class="ld-enter-btn" id="ldEnterBtn" onclick="dismissLoader()">PRESS START ✦</button>
+        <div class="ld-enter-hint">[ click to continue ]</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function dismissLoader() {
+      const loader = document.getElementById('loader');
+      if (!loader) return;
+      loader.classList.add('hide');
+      document.body.style.overflow = '';
+      setTimeout(() => loader.remove(), 700);
+      setTimeout(() => { if (window.showAgentGuide) showAgentGuide(); }, 1000);
+    }
+
+    (function () {
+      // Guard against a stale cached homepage (old record-player UI) after case-study return.
+      function assertCassetteVibeUI() {
+        const deck = document.querySelector('[data-vibe-ui="cassette-walkman"]');
+        if (deck) return;
+        const url = new URL(window.location.href);
+        if (url.searchParams.get('vibeui') === 'refresh') return;
+        url.searchParams.set('vibeui', 'refresh');
+        url.searchParams.set('skipLoader', '1');
+        window.location.replace(url.toString());
+      }
+      window.addEventListener('pageshow', assertCassetteVibeUI);
+      document.addEventListener('DOMContentLoaded', assertCassetteVibeUI);
+
+      const params = new URLSearchParams(location.search);
+      if (params.has('skipLoader')) {
+        const loader = document.getElementById('loader');
+        if (loader) loader.remove();
+        document.body.style.overflow = '';
+        const hash = location.hash || '#home';
+        history.replaceState(null, '', location.pathname + hash);
+        window.__skipLoaderPending = true;
+        return;
+      }
+
+      document.body.style.overflow = 'hidden';
+
+      // ── Typewriter helper ──
+      // Renders plain text char-by-char into `el`, skipping over HTML tags instantly.
+      // `onDone` fires when the last visible char is placed.
+      function typewrite(el, html, speed, onDone) {
+        // Parse into segments: {type:'text'|'tag', content}
+        const segments = [];
+        const re = /(<[^>]+>)|([^<]+)/g;
+        let m;
+        while ((m = re.exec(html)) !== null) {
+          if (m[1]) segments.push({ type: 'tag', content: m[1] });
+          else segments.push({ type: 'text', content: m[2] });
+        }
+
+        let built = '';
+        let si = 0, ci = 0;
+
+        function tick() {
+          if (si >= segments.length) { if (onDone) onDone(); return; }
+          const seg = segments[si];
+          if (seg.type === 'tag') {
+            built += seg.content; si++; ci = 0;
+            el.innerHTML = built + '<span class="ld-cursor">▌</span>';
+            tick(); // tags are instant
+          } else {
+            built += seg.content[ci];
+            ci++;
+            el.innerHTML = built + '<span class="ld-cursor">▌</span>';
+            if (ci >= seg.content.length) { si++; ci = 0; }
+            setTimeout(tick, speed);
+          }
+        }
+        tick();
+      }
+
+      // ── Log lines ──
+      const logLines = [
+        { icon: 'ok', text: 'SYSTEM <span class="key">BOOT</span> .............. OK' },
+        { icon: 'ok', text: 'LOADING <span class="key">DESIGN_SKILLS</span> ...... OK' },
+        { icon: 'ok', text: 'IMPORTING <span class="key">REACT</span> ............ OK' },
+        { icon: 'warn', text: 'CHECKING <span class="key">W3C_COMPLIANCE</span> .... OK' },
+        { icon: 'ok', text: 'MOUNTING <span class="key">PORTFOLIO.EXE</span> ...... OK' },
+      ];
+
+      const CHAR_SPEED = 22;  // ms per character — snappy terminal feel
+      const LINE_PAUSE = 80;  // ms gap between finishing one line and starting next
+
+      const log = document.getElementById('ldLog');
+
+      function runLine(index) {
+        if (index >= logLines.length) return;
+        const { icon, text } = logLines[index];
+
+        const el = document.createElement('div');
+        el.className = 'ld-log-line show'; // already visible — typewriter handles reveal
+        // Prefix icon rendered instantly before typing starts
+        const iconHtml = `<span class="${icon}">${icon === 'ok' ? '✔' : '!'}</span>`;
+        el.innerHTML = iconHtml;
+        log.appendChild(el);
+
+        // We type into a separate inner span so the icon stays put
+        const textSpan = document.createElement('span');
+        textSpan.className = 'ld-log-text';
+        el.appendChild(textSpan);
+
+        typewrite(textSpan, text, CHAR_SPEED, () => {
+          // Remove blinking cursor char once line is done
+          textSpan.innerHTML = text;
+          setTimeout(() => runLine(index + 1), LINE_PAUSE);
+        });
+      }
+
+      // Start first line after initial fade-in settles
+      setTimeout(() => runLine(0), 750);
+
+      // ── Stat bars: charge to 100%, stay there ──
+      document.querySelectorAll('.ld-stat-fill').forEach((el, i) => {
+        setTimeout(() => {
+          el.style.transition = 'width 0.5s cubic-bezier(.4,0,.2,1)';
+          el.style.width = '100%';
+        }, 1050 + i * 150);
+      });
+
+      // ── Main progress bar ──
+      let pct = 0;
+      const fill = document.getElementById('ldBarFill');
+      const pctEl = document.getElementById('ldPct');
+      const stages = [
+        { target: 30, duration: 500, start: 900 },
+        { target: 62, duration: 600, start: 1400 },
+        { target: 85, duration: 500, start: 2000 },
+        { target: 100, duration: 350, start: 2650 },
+      ];
+      stages.forEach(({ target, duration, start }) => {
+        setTimeout(() => {
+          const from = pct;
+          const range = target - from;
+          const t0 = performance.now();
+          (function step(now) {
+            const t = Math.min((now - t0) / duration, 1);
+            const e = 1 - Math.pow(1 - t, 3);
+            pct = from + range * e;
+            fill.style.width = pct + '%';
+            pctEl.textContent = Math.round(pct) + '%';
+            if (t < 1) requestAnimationFrame(step);
+          })(t0);
+        }, start);
+      });
+
+      // ── Show enter button ──
+      setTimeout(() => { document.getElementById('ldEnter').classList.add('show'); }, 3200);
+    })();
+  </script>
+  <!-- ══ /LOADER ══ -->
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-dot" id="cursorDot"></div>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="doodle-bg">
+    <svg viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <circle cx="200" cy="150" r="80" stroke="#1a1207" stroke-width="2.5" />
+      <circle cx="200" cy="150" r="48" stroke="#1a1207" stroke-width="1.5" />
+      <rect x="1200" y="80" width="120" height="120" rx="12" stroke="#1a1207" stroke-width="2.5"
+        transform="rotate(15 1260 140)" />
+      <polygon points="100,820 165,710 230,820" stroke="#1a1207" stroke-width="2" fill="none" />
+      <path d="M1340 580 Q1380 540 1420 580 Q1380 620 1340 580Z" stroke="#1a1207" stroke-width="2.5" fill="none" />
+      <line x1="620" y1="40" x2="660" y2="80" stroke="#1a1207" stroke-width="2.5" />
+      <line x1="660" y1="40" x2="620" y2="80" stroke="#1a1207" stroke-width="2.5" />
+      <circle cx="640" cy="60" r="32" stroke="#1a1207" stroke-width="1.5" stroke-dasharray="6 4" />
+      <rect x="50" y="400" width="60" height="60" rx="6" stroke="#1a1207" stroke-width="1.5"
+        transform="rotate(-10 80 430)" />
+      <circle cx="1390" cy="400" r="42" stroke="#1a1207" stroke-width="2.5" stroke-dasharray="7 5" />
+      <path d="M700 140 L722 118 L744 140 L766 118 L788 140" stroke="#1a1207" stroke-width="2.5" fill="none"
+        stroke-linecap="round" />
+      <circle cx="900" cy="820" r="55" stroke="#1a1207" stroke-width="2" stroke-dasharray="4 6" />
+      <rect x="360" y="750" width="50" height="50" rx="50" stroke="#1a1207" stroke-width="2" />
+    </svg>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <div class="toast-icon" id="toastIcon">🎉</div>
+    <div class="toast-body">
+      <div class="toast-title" id="toastTitle">UNLOCKED!</div>
+      <div class="toast-sub" id="toastSub">New section discovered</div>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav-backdrop" id="navBackdrop" aria-hidden="true"></div>
+  <nav id="siteNav">
+    <a href="#home" class="nav-logo">✦ McKenna Wilson</a>
+    <div class="nav-menu" id="navMenu">
+      <div class="nav-links">
+        <a href="#vibe">Soundtrack</a>
+        <a href="#projects">Work</a>
+        <a href="#achievements">Badges</a>
+        <a href="#about">About</a>
+        <a href="#contact" class="contact-btn">Contact Me</a>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <div class="nav-score" id="navScore">
+        <span class="star">✦</span>&nbsp;<span id="scoreVal">0</span>&nbsp;XP
+      </div>
+      <button type="button" class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false"
+        aria-controls="navMenu">
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero" id="home">
+    <div class="hero-text">
+      <h1 class="hero-name">
+        McKenna<br><em>Wilson</em><br>
+      </h1>
+      <p class="hero-role">
+        UX Designer who codes. Frontend Developer who empathsizes. <strong>A UX Engineer.</strong> <br>
+        Building products people actually enjoy using.
+      </p>
+      <div class="hero-tags">
+        <button type="button" class="htag htag-1" data-skill="sc-1" aria-haspopup="dialog">Visual Design</button>
+        <button type="button" class="htag htag-2" data-skill="sc-2" aria-haspopup="dialog">UX Research</button>
+        <button type="button" class="htag htag-3" data-skill="sc-3" aria-haspopup="dialog">Front End Development</button>
+        <button type="button" class="htag htag-4" data-skill="sc-4" aria-haspopup="dialog">Design Systems</button>
+        <button type="button" class="htag htag-5" data-skill="sc-5" aria-haspopup="dialog">3D &amp; Animation</button>
+        <button type="button" class="htag htag-6" data-skill="sc-6" aria-haspopup="dialog">My Design Tools</button>
+      </div>
+      <div class="hero-btns">
+        <a href="#projects" class="btn btn-fill">See my work ↓</a>
+        <a href="#contact" class="btn btn-outline">Get in touch</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-photo">
+        <img src="assets/profile-picture.png" alt="Portrait of McKenna Wilson">
+      </div>
+      <div class="vis-card vis-card-1">
+        <div class="vc-label">UX Skill</div>
+        <div class="vc-title">🎨 UX/UI Design</div>
+        <div class="vc-bar">
+          <div class="vc-fill" style="width:92%"></div>
+        </div>
+        <div class="vc-bar">
+          <div class="vc-fill" style="width:78%;animation-delay:.3s"></div>
+        </div>
+        <div class="vc-bar">
+          <div class="vc-fill" style="width:85%;animation-delay:.6s"></div>
+        </div>
+      </div>
+      <div class="vis-card vis-card-2">
+        <div class="vc-label">Frontend</div>
+        <div class="vc-title">⚛️ React/ HTML/ CSS/ JavaScript/ TypeScript</div>
+        <div class="vc-bar">
+          <div class="vc-fill" style="width:85%"></div>
+        </div>
+        <div class="vc-bar">
+          <div class="vc-fill" style="width:90%;animation-delay:.4s"></div>
+        </div>
+      </div>
+      <div class="vis-card vis-card-3">
+        <div class="vc-label">Research</div>
+        <div class="vc-title">🔬 User Testing</div>
+        <div class="vc-bar">
+          <div class="vc-fill" style="width:88%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stripe-band full-bleed"></div>
+
+  <!-- VIBE -->
+  <div class="section-wrap" id="vibe">
+    <div class="section-label reveal">✦ 01 — Soundtrack</div>
+    <h2 class="section-title ul-lemon reveal">Set the <span>vibe</span>. Browse the work.</h2>
+    <div class="vibe-deck reveal" id="vibeDeck" style="--vibe-color: var(--coral)">
+      <div class="vibe-stage">
+        <div class="cassette-deck" data-vibe-ui="cassette-walkman">
+          <div class="walkman-top" role="group" aria-label="Cassette controls">
+            <button type="button" class="vibe-btn" id="vibePrev" aria-label="Previous tape" disabled>⏮</button>
+            <button type="button" class="vibe-btn vibe-btn-play" id="vibePlay" aria-pressed="false" disabled>
+              <span id="vibePlayIcon">▶</span>
+              <span id="vibePlayLabel">Play</span>
+            </button>
+            <button type="button" class="vibe-btn" id="vibeNext" aria-label="Next tape" disabled>⏭</button>
+            <button type="button" class="vibe-btn vibe-btn-eject" id="vibeEject" disabled>⏏</button>
+          </div>
+          <div class="cassette-slot" id="cassetteSlot">
+            <div class="cassette-slot-empty">Drag a tape here</div>
+            <div class="deck-cassette" id="deckCassette" aria-hidden="true">
+              <div class="deck-cassette-label" id="vibeLabelText">Focus Flow</div>
+              <div class="deck-cassette-window">
+                <span class="cassette-reel reel-left" id="reelLeft"></span>
+                <span class="cassette-reel reel-right" id="reelRight"></span>
+              </div>
+              <div class="deck-cassette-footer">
+                <span>TYPE I</span>
+                <span id="vibeTapeCode">RTMC60</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="vibe-controls">
+          <div class="vibe-now">
+            <span class="vibe-now-label" id="vibeNowLabel">No tape loaded</span>
+            <div class="vibe-now-title" id="vibeNowTitle">Browse the rack</div>
+            <div class="vibe-now-meta" id="vibeNowMeta">Drag a cassette into the deck to play</div>
+          </div>
+          <div class="vibe-progress" aria-hidden="true">
+            <div class="vibe-progress-fill" id="vibeProgressFill"></div>
+          </div>
+          <audio id="vibeAudio" preload="metadata"></audio>
+          <p class="vibe-credit">Music: Kevin MacLeod (incompetech.com) · CC BY</p>
+        </div>
+      </div>
+
+      <div>
+        <div class="tape-rack-label">Tape rack · drag into the deck</div>
+        <div class="tape-rack" role="listbox" aria-label="Drag a cassette tape into the deck">
+          <button type="button" class="tape-card" role="option" aria-selected="false" data-vibe="0" style="--vibe-color: var(--coral)" draggable="true">
+            <div class="tape-card-shell" aria-hidden="true"><span></span><span></span></div>
+            <div class="tape-card-title">Focus Flow</div>
+            <div class="tape-card-meta">Calm focus</div>
+            <div class="tape-card-action">Drag to deck</div>
+          </button>
+          <button type="button" class="tape-card" role="option" aria-selected="false" data-vibe="1" style="--vibe-color: var(--lemon)" draggable="true">
+            <div class="tape-card-shell" aria-hidden="true"><span></span><span></span></div>
+            <div class="tape-card-title">Creative Spark</div>
+            <div class="tape-card-meta">Bright energy</div>
+            <div class="tape-card-action">Drag to deck</div>
+          </button>
+          <button type="button" class="tape-card" role="option" aria-selected="false" data-vibe="2" style="--vibe-color: var(--lilac)" draggable="true">
+            <div class="tape-card-shell" aria-hidden="true"><span></span><span></span></div>
+            <div class="tape-card-title">Late Night Code</div>
+            <div class="tape-card-meta">After dark</div>
+            <div class="tape-card-action">Drag to deck</div>
+          </button>
+          <button type="button" class="tape-card" role="option" aria-selected="false" data-vibe="3" style="--vibe-color: var(--mint)" draggable="true">
+            <div class="tape-card-shell" aria-hidden="true"><span></span><span></span></div>
+            <div class="tape-card-title">Sunny Build</div>
+            <div class="tape-card-meta">Upbeat</div>
+            <div class="tape-card-action">Drag to deck</div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stripe-band"></div>
+
+  <!-- PROJECTS -->
+  <div class="section-wrap" id="projects">
+    <div class="section-label reveal">✦ 02 — Quest Log</div>
+    <h2 class="section-title ul-mint reveal">Things I've <span>shipped</span></h2>
+    <div class="projects-list">
+
+
+      <div class="project-card reveal" id="p9">
+        <div class="pc-top">
+          <div class="pc-emoji"><img src="assets/bamboologo2.jfif" alt="BambooHR Logo"></div>
+          <div class="pc-info">
+            <div class="pc-header">
+              <div class="pc-title">Time &amp; Attendance Onboarding AI</div>
+              <div class="pc-meta">
+                <button type="button" class="pc-xp-badge" data-xp="2800" data-project="p9" aria-label="Claim 2800 XP">+2800 XP</button>
+                <span class="pc-project-type">Client Project</span>
+              </div>
+            </div>
+            <div class="pc-desc">An AI-first onboarding experience that helps HR managers understand and configure time
+              and attendance settings with more confidence.</div>
+            <div class="pc-tags"><span class="pc-tag pct-ux">UX Design</span><span
+                class="pc-tag pct-figma">Figma</span><span class="pc-tag pct-claude">Claude Code</span></div>
+            <a class="pc-expand-btn" href="case-studies/time-attendance-onboarding-ai.html">Check Out Work <span
+            class="pc-chevron">→</span></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card reveal" id="p2">
+        <div class="pc-top">
+          <div class="pc-emoji"><img src="assets/bamboologo2.jfif" alt="BambooHR Logo"></div>
+          <div class="pc-info">
+            <div class="pc-header">
+              <div class="pc-title">BambooHR Automatic Meal and Rest Breaks</div>
+              <div class="pc-meta">
+                <button type="button" class="pc-xp-badge" data-xp="2600" data-project="p2" aria-label="Claim 2600 XP">+2600 XP</button>
+                <span class="pc-project-type">Client Project</span>
+              </div>
+            </div>
+            <div class="pc-desc">Led end-to-end UX for BambooHR’s automated meal and rest break deductions—running user interviews, prototyping and testing flows, and partnering with developers—to ship a compliant, intuitive experience for HR managers and employees.
+            </div>
+            <div class="pc-tags"><span class="pc-tag pct-ux">UX Design</span><span
+                class="pc-tag pct-figma">Figma</span><span class="pc-tag pct-res">User Research</span><span
+                class="pc-tag pct-test">Usability Testing</span><span class="pc-tag pct-claude">Claude Code</span></div>
+            <a class="pc-expand-btn" href="case-studies/bamboohr-automatic-meal-and-rest-breaks.html">Check Out Work <span
+            class="pc-chevron">→</span></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card reveal" id="p1">
+        <div class="pc-top">
+          <div class="pc-emoji"><img src="assets/bamboologo2.jfif" alt="BambooHR Logo"></div>
+          <div class="pc-info">
+            <div class="pc-header">
+              <div class="pc-title">BambooHR AI Agent</div>
+              <div class="pc-meta">
+                <button type="button" class="pc-xp-badge" data-xp="3000" data-project="p1" aria-label="Claim 3000 XP">+3000 XP</button>
+                <span class="pc-project-type">Client Project</span>
+              </div>
+            </div>
+            <div class="pc-desc">Designed and developed the UI for a BambooHR agentic AI system for meal and rest break management, keeping users informed and engaged while the agent gathered context and generated recommendations.
+            </div>
+            <div class="pc-tags"><span class="pc-tag pct-ux">UX Design</span><span
+                class="pc-tag pct-figma">Figma</span><span class="pc-tag pct-res">User Research</span><span
+                class="pc-tag pct-claude">Claude Code</span></div>
+            <a class="pc-expand-btn" href="case-studies/bambooai.html">Check Out Work <span
+            class="pc-chevron">→</span></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card reveal" style="transition-delay:.1s" id="p6">
+        <div class="pc-top">
+          <div class="pc-emoji"><img src="assets/wildhorse-logo.png" alt="Wildhorse Creek Ranch Outfitters Logo"></div>
+          <div class="pc-info">
+            <div class="pc-header">
+              <div class="pc-title">Wildhorse Creek Ranch Outfitters Website</div>
+              <div class="pc-meta">
+                <button type="button" class="pc-xp-badge" data-xp="2100" data-project="p6" aria-label="Claim 2100 XP">+2100 XP</button>
+                <span class="pc-project-type">Client Project</span>
+              </div>
+            </div>
+            <div class="pc-desc">Designed and developed the website to improve the user experience and increase online
+              bookings.</div>
+            <div class="pc-tags"><span class="pc-tag pct-js">JavaScript</span><span
+                class="pc-tag pct-ux">UX Design</span><span class="pc-tag pct-react">React</span></div>
+            <a class="pc-expand-btn" href="case-studies/wildhorse-ranch-outfitters.html">Check Out Work <span
+            class="pc-chevron">→</span></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card reveal" id="p3">
+        <div class="pc-top">
+          <div class="pc-emoji"><img src="assets/domus logo.png" alt="Domus Home Hub Logo"></div>
+          <div class="pc-info">
+            <div class="pc-header">
+              <div class="pc-title">Domus Home Hub</div>
+              <div class="pc-meta">
+                <button type="button" class="pc-xp-badge" data-xp="2400" data-project="p3" aria-label="Claim 2400 XP">+2400 XP</button>
+                <span class="pc-project-type">Client Project</span>
+              </div>
+            </div>
+            <div class="pc-desc">End-to-end design from wireframe to raw code. Domus is an in kitchen dashboard created
+              to help families stay connected, even on the busiest of days.</div>
+            <div class="pc-tags"><span class="pc-tag pct-ux">UX Design</span><span
+                class="pc-tag pct-res">User Research</span><span class="pc-tag pct-react">React</span></div>
+            <a class="pc-expand-btn" href="case-studies/domus-home-hub.html">Check Out Work <span
+            class="pc-chevron">→</span></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card reveal" style="transition-delay:.1s" id="p5">
+        <div class="pc-top">
+          <div class="pc-emoji"><img src="assets/leaf.png" alt="Agriculture and AI Integration Logo"></div>
+          <div class="pc-info">
+            <div class="pc-header">
+              <div class="pc-title">Agriculture and AI Integration</div>
+              <div class="pc-meta">
+                <button type="button" class="pc-xp-badge" data-xp="1800" data-project="p5" aria-label="Claim 1800 XP">+1800 XP</button>
+                <span class="pc-project-type">Concept Project</span>
+              </div>
+            </div>
+            <div class="pc-desc">Integrated AI into an agriculture platform to help farmers make data-driven decisions.
+              This project involved working with a team of farmers to understand their needs and create a solution that
+              would help them improve their productivity.</div>
+            <div class="pc-tags"><span class="pc-tag pct-ds">Design System</span><span
+                class="pc-tag pct-figma">Figma</span><span class="pc-tag pct-test">Usability Testing</span></div>
+            <a class="pc-expand-btn" href="case-studies/agriculture-ai-integration.html">Check Out Work <span
+            class="pc-chevron">→</span></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card reveal" style="transition-delay:.3s" id="p7">
+        <div class="pc-top">
+          <div class="pc-emoji"><img src="assets/edaslogo.png" alt="EDAS Logo"></div>
+
+          <div class="pc-info">
+            <div class="pc-header">
+              <div class="pc-title">EDAS Site Redesign</div>
+              <div class="pc-meta">
+                <button type="button" class="pc-xp-badge" data-xp="2100" data-project="p7" aria-label="Claim 2100 XP">+2100 XP</button>
+                <span class="pc-project-type">Concept Project</span>
+              </div>
+            </div>
+            <div class="pc-desc">Redesigned the EDAS site to improve the user experience and increase online bookings.
+            </div>
+            <div class="pc-tags"><span class="pc-tag pct-html">HTML</span><span class="pc-tag pct-ux">UX Design</span><span
+                class="pc-tag pct-next">Next.js</span></div>
+            <a class="pc-expand-btn" href="case-studies/edas-site-redesign.html">Check Out Work <span
+            class="pc-chevron">→</span></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card reveal" id="p4">
+        <div class="pc-top">
+          <div class="pc-emoji"><img src="assets/kinship-logo.png" alt="Domus Home Hub Logo"></div>
+          <div class="pc-info">
+            <div class="pc-header">
+              <div class="pc-title">Kinship</div>
+              <div class="pc-meta">
+                <button type="button" class="pc-xp-badge" data-xp="1600" data-project="p4" aria-label="Claim 1600 XP">+1600 XP</button>
+                <span class="pc-project-type">Concept Project</span>
+              </div>
+            </div>
+            <div class="pc-desc">End-to-end design and development of a new website for Kinship, a digital end of life planning platform.</div>
+            <div class="pc-tags"><span class="pc-tag pct-ux">UX Design</span><span
+                class="pc-tag pct-type">Typography/Color</span><span class="pc-tag pct-ds">Design System</span></div>
+            <a class="pc-expand-btn" href="case-studies/kinship-website.html">Check Out Work <span
+          class="pc-chevron">→</span></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-card reveal" style="transition-delay:.3s" id="p8">
+        <div class="pc-top">
+          <div class="pc-emoji"><img src="assets/maillogo.png" alt="AOL Logo"></div>
+
+          <div class="pc-info">
+            <div class="pc-header">
+              <div class="pc-title">AOL Mail Redesign</div>
+              <div class="pc-meta">
+                <button type="button" class="pc-xp-badge" data-xp="2100" data-project="p8" aria-label="Claim 2100 XP">+2100 XP</button>
+                <span class="pc-project-type">Concept Project</span>
+              </div>
+            </div>
+            <div class="pc-desc">Redesigned the AOL Mail site to improve the user experience and increase user
+              engagement.</div>
+            <div class="pc-tags"><span class="pc-tag pct-html">HTML</span><span class="pc-tag pct-ux">UX Design</span><span
+                class="pc-tag pct-next">Next.js</span></div>
+            <a class="pc-expand-btn" href="case-studies/aol-site-redesign.html">Check Out Work <span
+            class="pc-chevron">→</span></a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="stripe-band"></div>
+
+  <!-- ACHIEVEMENTS -->
+  <div class="section-wrap" id="achievements">
+    <div class="section-label reveal">✦ 03 — Badge Collection</div>
+    <h2 class="section-title ul-sky reveal"><span>Deliverables</span> made for you</h2>
+    <div class="ach-grid">
+      <div class="ach-card reveal"><span class="ach-rarity r-legendary">★ Legend</span><span class="ach-icon">🖥️</span>
+        <div class="ach-name">Websites</div>
+        <div class="ach-desc">Responsive, polished sites designed and built around your goals</div>
+      </div>
+      <div class="ach-card reveal" style="transition-delay:.06s"><span class="ach-rarity r-legendary">★
+          Legend</span><span class="ach-icon">📱</span>
+        <div class="ach-name">Apps</div>
+        <div class="ach-desc">User friendly product interfaces from concept to clickable flow</div>
+      </div>
+      <div class="ach-card reveal" style="transition-delay:.12s"><span class="ach-rarity r-epic">◆ Epic</span><span
+          class="ach-icon">⚡</span>
+        <div class="ach-name">Consulting</div>
+        <div class="ach-desc">Design and frontend guidance for stronger product decisions</div>
+      </div>
+      <div class="ach-card reveal" style="transition-delay:.18s"><span class="ach-rarity r-epic">◆ Epic</span><span
+          class="ach-icon">🧩</span>
+        <div class="ach-name">AI</div>
+        <div class="ach-desc">AI powered product ideas, workflows, and interface explorations</div>
+      </div>
+      <div class="ach-card reveal" style="transition-delay:.24s"><span class="ach-rarity r-rare">◇ Rare</span><span
+          class="ach-icon">🧑‍💻</span>
+        <div class="ach-name">UX Audits</div>
+        <div class="ach-desc">Actionable reviews to uncover friction and improve usability</div>
+      </div>
+    </div>
+
+    <div class="stripe-band full-bleed"></div>
+
+    <!-- ABOUT -->
+    <div class="section-wrap" id="about">
+      <div class="section-label reveal">✦ 04 — Player Profile</div>
+      <h2 class="section-title ul-lemon reveal">A little <span>about me</span></h2>
+      <div class="about-grid">
+        <div class="about-blurb reveal">
+          <p>I'm a <strong>UX designer who codes</strong> and a <strong>developer who empathises.</strong> I live at the
+            intersection where great ideas become great interfaces.</p>
+          <p>The best products happen when design and engineering speak the same language — and I'm fluent in both.</p>
+          <p>Off-screen: <strong>Fly fishing</strong>, <strong>hiking trails</strong>, <strong>backpacking</strong>,
+            dabbling in <strong>pickleball</strong>, <strong>running</strong>, <strong>acrylic/oil painting</strong> and
+            always enjoying a good movie.</p>
+        </div>
+        <div class="about-photo reveal">
+          <img src="assets/about-photo.png" alt="McKenna fly fishing with a salmon">
+        </div>
+        <div class="about-stats">
+          <div class="astat reveal" style="transition-delay:.1s">
+            <div class="astat-num" style="color:var(--coral)">4</div>
+            <div class="astat-text">Years building digital products people actually love</div>
+          </div>
+          <div class="astat reveal" style="transition-delay:.2s">
+            <div class="astat-num" style="color:var(--mint)">10+</div>
+            <div class="astat-text">Projects shipped across health, home &amp; services</div>
+          </div>
+          <div class="astat reveal" style="transition-delay:.3s">
+            <div class="astat-num" style="color:var(--sky)">260</div>
+            <div class="astat-text">President of ProdUX, one of the largest product design communities in Utah.
+              (consisting of 260+ members)</div>
+          </div>
+          <div class="astat reveal" style="transition-delay:.4s">
+            <div class="astat-num" style="color:var(--lilac)">∞</div>
+            <div class="astat-text">Browser tabs open at any given moment (it's a feature)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stripe-band full-bleed"></div>
+
+    <!-- CONTACT -->
+    <div class="section-wrap" id="contact">
+      <div class="section-label reveal">✦ 05 — Initiate Contact</div>
+      <h2 class="section-title ul-coral reveal">Let's <span>build something</span> together</h2>
+      <div class="contact-grid">
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=mckennawilson1824@gmail.com" target="_blank"
+          rel="noopener noreferrer" class="contact-card cc-1 reveal">
+          <div class="cc-icon">📧</div>
+          <div>
+            <div class="cc-label">Email</div>
+            <div class="cc-value">mckennawilson1824@gmail.com</div>
+          </div>
+        </a>
+        <a href="https://www.linkedin.com/in/mckenna-wilson-3404402a2" target="_blank" rel="noopener noreferrer"
+          class="contact-card cc-2 reveal" style="transition-delay:.08s">
+          <div class="cc-icon">💼</div>
+          <div>
+            <div class="cc-label">LinkedIn</div>
+            <div class="cc-value">www.linkedin.com/in/mckenna-wilson-3404402a2</div>
+          </div>
+        </a>
+        <a href="#" class="contact-card cc-3 reveal" style="transition-delay:.16s">
+          <div class="cc-icon">🐙</div>
+          <div>
+            <div class="cc-label">GitHub</div>
+            <div class="cc-value">https://github.com/KennaWilson</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Skill detail modal -->
+    <div class="skill-modal" id="skillModal" hidden>
+      <div class="skill-modal-backdrop" data-skill-close tabindex="-1"></div>
+      <div class="skill-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="skillModalTitle">
+        <button type="button" class="skill-modal-close" id="skillModalClose" aria-label="Close skill details">×</button>
+        <div class="skill-modal-card" id="skillModalCard"></div>
+      </div>
+    </div>
+
+    <!-- Agent guide -->
+    <div class="agent-widget" id="agentWidget">
+      <div class="agent-panel" id="agentPanel" role="dialog" aria-modal="true" aria-labelledby="agentTitle"
+        aria-hidden="true">
+        <div class="agent-panel-header">
+          <div class="agent-panel-title" id="agentTitle">Player Guide</div>
+          <div class="agent-panel-sub">GUIDE_AI :: ONLINE</div>
+          <button type="button" class="agent-close" id="agentClose" aria-label="Close guide">×</button>
+        </div>
+        <div class="agent-question" id="agentQuestion"></div>
+        <div class="agent-answer" id="agentAnswer"></div>
+        <div class="agent-presets" id="agentPresets"></div>
+        <div class="agent-chips" id="agentChips"></div>
+        <button type="button" class="agent-next" id="agentNext">Next fact →</button>
+      </div>
+      <button type="button" class="agent-orb" id="agentOrb" aria-label="Open McKenna's guide" aria-expanded="false"
+        aria-controls="agentPanel">
+        <span class="agent-orb-glow" aria-hidden="true"></span>
+        <span class="agent-orb-icon" aria-hidden="true">✦</span>
+      </button>
+      <div class="agent-hint" aria-hidden="true">click me to learn more about McKenna</div>
+    </div>
+
+    <footer>
+      <p>Designed &amp; coded ✦ by McKenna Wilson · 2026</p>
+    </footer>
+
+    <section class="bonus-game" id="bonusGame" aria-label="Bonus hopping dino game">
+      <div class="dino-boot" id="dinoBoot" hidden aria-live="polite" aria-busy="true">
+        <div class="dino-spinner" role="status" aria-label="Loading"></div>
+      </div>
+
+      <div class="dino-game-content" id="dinoGameContent" hidden>
+        <div class="section-label">✦ Bonus Level</div>
+        <h2 class="section-title ul-coral" style="margin-bottom: 24px;">Hopping <span>Dino</span></h2>
+        <div class="bonus-game-frame is-locked" id="dinoGameShell">
+          <div class="bonus-game-shell">
+            <div class="bonus-game-hud">
+              <div class="bonus-game-stat">Score <strong id="dinoGameScore">00000</strong></div>
+              <div class="bonus-game-stat">Best <strong id="dinoGameBest">00000</strong></div>
+              <div class="bonus-game-stat">Speed <strong id="dinoGameSpeed">1.0x</strong></div>
+            </div>
+            <div class="bonus-game-stage">
+              <canvas id="dinoGameCanvas" width="900" height="220" aria-label="Hopping dino runner. Press space or tap to jump over cactus obstacles."></canvas>
+              <div class="bonus-game-overlay" id="dinoGameOverlay" hidden>
+                <h3 id="dinoGameOverlayTitle">Secret level unlocked</h3>
+                <p id="dinoGameOverlayText">A tiny endless runner — jump the cacti, keep hopping, chase a high score.</p>
+                <button type="button" class="btn btn-fill" id="dinoGameStart">Press Start</button>
+              </div>
+            </div>
+          </div>
+          <div class="dino-lock-modal" id="dinoLockModal" role="dialog" aria-modal="true" aria-labelledby="dinoLockTitle">
+            <div class="dino-lock-card">
+              <h3 id="dinoLockTitle">Go collect all XP to unlock game</h3>
+            </div>
+          </div>
+        </div>
+        <p class="bonus-game-tip">Space / ↑ / click / tap to jump</p>
+      </div>
+    </section>
+
+    <script src="assets/vibes/vibe-persist.js?v=20261105c"></script>
+    <script>
+      // Cursor (desktop only)
+      if (window.matchMedia('(min-width: 821px)').matches) {
+        const cur = document.getElementById('cursor');
+        const dot = document.getElementById('cursorDot');
+        let mx = 0, my = 0, cx = 0, cy = 0, lastTrail = 0;
+
+        function spawnTrail(x, y) {
+          const trail = document.createElement('div');
+          trail.className = 'cursor-trail';
+          trail.style.left = x + 'px';
+          trail.style.top = y + 'px';
+          trail.style.background = Math.random() > 0.5 ? 'var(--coral)' : 'var(--lilac)';
+          document.body.appendChild(trail);
+          setTimeout(() => trail.remove(), 460);
+        }
+
+        document.addEventListener('mousemove', e => {
+          mx = e.clientX;
+          my = e.clientY;
+          dot.style.left = mx - 3 + 'px';
+          dot.style.top = my - 3 + 'px';
+
+          const now = performance.now();
+          if (now - lastTrail > 18) {
+            spawnTrail(mx, my);
+            lastTrail = now;
+          }
+        });
+        (function lerp() {
+          cx += (mx - cx) * 0.13;
+          cy += (my - cy) * 0.13;
+          cur.style.left = cx - 9 + 'px';
+          cur.style.top = cy - 9 + 'px';
+          requestAnimationFrame(lerp);
+        })();
+        document.querySelectorAll('a,button,.skill-card,.project-card,.ach-card:not(.locked),.astat,.contact-card,.htag,.vis-card,.agent-orb,.agent-close,.agent-preset,.agent-chip,.agent-next,.nav-toggle,.pc-xp-badge:not(.collected)').forEach(el => {
+          el.addEventListener('mouseenter', () => { cur.style.transform = 'scale(2.2)'; cur.style.background = 'var(--lemon)'; });
+          el.addEventListener('mouseleave', () => { cur.style.transform = 'scale(1)'; cur.style.background = 'var(--coral)'; });
+        });
+      }
+
+      // Mobile nav
+      (function () {
+        const nav = document.getElementById('siteNav');
+        const toggle = document.getElementById('navToggle');
+        const menu = document.getElementById('navMenu');
+        const backdrop = document.getElementById('navBackdrop');
+        if (!nav || !toggle || !menu) return;
+
+        function closeMenu() {
+          nav.classList.remove('menu-open');
+          toggle.setAttribute('aria-expanded', 'false');
+          toggle.setAttribute('aria-label', 'Open menu');
+          backdrop.classList.remove('show');
+          backdrop.setAttribute('aria-hidden', 'true');
+          document.body.style.overflow = '';
+        }
+
+        function openMenu() {
+          nav.classList.add('menu-open');
+          toggle.setAttribute('aria-expanded', 'true');
+          toggle.setAttribute('aria-label', 'Close menu');
+          backdrop.classList.add('show');
+          backdrop.setAttribute('aria-hidden', 'false');
+          document.body.style.overflow = 'hidden';
+        }
+
+        toggle.addEventListener('click', () => {
+          if (nav.classList.contains('menu-open')) closeMenu();
+          else openMenu();
+        });
+
+        backdrop.addEventListener('click', closeMenu);
+
+        menu.querySelectorAll('a').forEach(link => {
+          link.addEventListener('click', closeMenu);
+        });
+
+        document.addEventListener('keydown', e => {
+          if (e.key === 'Escape' && nav.classList.contains('menu-open')) closeMenu();
+        });
+
+        window.addEventListener('resize', () => {
+          if (window.innerWidth > 820) closeMenu();
+        });
+      })();
+
+      // Progress / XP
+      const pb = document.getElementById('progressBar');
+      const sv = document.getElementById('scoreVal');
+      const navScore = document.getElementById('navScore');
+      const XP_STORAGE_KEY = 'mckenna_claimed_projects';
+      const SCROLL_PROGRESS_KEY = 'mckenna_max_scroll_progress';
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const navEntry = performance.getEntriesByType('navigation')[0];
+      const isPageRefresh = navEntry && navEntry.type === 'reload';
+
+      if (isPageRefresh) {
+        sessionStorage.removeItem(XP_STORAGE_KEY);
+        sessionStorage.removeItem(SCROLL_PROGRESS_KEY);
+        if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+        window.scrollTo(0, 0);
+      }
+
+      const SCROLL_XP_MAX = 6300;
+      let maxScrollProgress = 0;
+      try {
+        maxScrollProgress = Math.min(1, Math.max(0, Number(sessionStorage.getItem(SCROLL_PROGRESS_KEY)) || 0));
+      } catch {
+        maxScrollProgress = 0;
+      }
+
+      function getCurrentScrollProgress() {
+        const maxScroll = document.body.scrollHeight - window.innerHeight;
+        return maxScroll > 0 ? Math.min(1, window.scrollY / maxScroll) : 0;
+      }
+
+      // Only grows on the first pass downward — scrolling back up does not shrink XP.
+      function getScrollProgress() {
+        const current = getCurrentScrollProgress();
+        if (current > maxScrollProgress) {
+          maxScrollProgress = current;
+          try {
+            sessionStorage.setItem(SCROLL_PROGRESS_KEY, String(maxScrollProgress));
+          } catch {}
+        }
+        return maxScrollProgress;
+      }
+
+      function getScrollXP() {
+        return Math.round(getScrollProgress() * SCROLL_XP_MAX);
+      }
+
+      function getClaimedProjects() {
+        try {
+          const raw = sessionStorage.getItem(XP_STORAGE_KEY);
+          return raw ? JSON.parse(raw) : [];
+        } catch {
+          return [];
+        }
+      }
+
+      function saveClaimedProjects(ids) {
+        sessionStorage.setItem(XP_STORAGE_KEY, JSON.stringify(ids));
+      }
+
+      function getClaimableXPMax() {
+        let total = 0;
+        document.querySelectorAll('.pc-xp-badge[data-project]').forEach(btn => {
+          total += Number(btn.dataset.xp) || 0;
+        });
+        return total;
+      }
+
+      function getClaimedXP() {
+        const claimed = new Set(getClaimedProjects());
+        let total = 0;
+        document.querySelectorAll('.pc-xp-badge[data-project]').forEach(btn => {
+          if (claimed.has(btn.dataset.project)) total += Number(btn.dataset.xp) || 0;
+        });
+        return total;
+      }
+
+      // Scroll fills the first half of the meter; claimed project XP fills the second half.
+      function getXPProgress() {
+        const claimableMax = getClaimableXPMax();
+        const scrollHalf = getScrollProgress() * 0.5;
+        const claimHalf = claimableMax > 0 ? (getClaimedXP() / claimableMax) * 0.5 : 0;
+        return Math.min(1, scrollHalf + claimHalf);
+      }
+
+      function isXPFull() {
+        return getXPProgress() >= 0.999;
+      }
+      window.getXPProgress = getXPProgress;
+      window.isXPFull = isXPFull;
+
+      function updateProgressBar() {
+        if (pb) pb.style.transform = `scaleX(${getXPProgress()})`;
+      }
+
+      function animateScoreTo(target, duration = 550) {
+        const start = parseInt(sv.textContent.replace(/,/g, ''), 10) || 0;
+        const diff = target - start;
+        if (!diff) return;
+        const t0 = performance.now();
+        function frame(now) {
+          const t = Math.min((now - t0) / duration, 1);
+          const eased = 1 - Math.pow(1 - t, 3);
+          sv.textContent = Math.round(start + diff * eased).toLocaleString();
+          if (t < 1) requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+      }
+
+      function updateScore(animate = false) {
+        const target = getScrollXP() + getClaimedXP();
+        if (animate) animateScoreTo(target);
+        else sv.textContent = target.toLocaleString();
+        updateProgressBar();
+        window.dispatchEvent(new CustomEvent('mckenna:xp-updated'));
+      }
+
+      function markBadgeCollected(btn) {
+        btn.classList.add('collected');
+        btn.classList.remove('claiming');
+        btn.disabled = true;
+        if (!btn.textContent.includes('✓')) btn.textContent += ' ✓';
+        btn.setAttribute('aria-label', 'XP claimed');
+      }
+
+      function restoreClaimedXP() {
+        const claimed = getClaimedProjects();
+        document.querySelectorAll('.pc-xp-badge[data-project]').forEach(btn => {
+          if (claimed.includes(btn.dataset.project)) markBadgeCollected(btn);
+        });
+        updateScore();
+      }
+
+      function flyXPParticles(fromEl, amount) {
+        if (prefersReducedMotion || !navScore) return Promise.resolve();
+
+        const from = fromEl.getBoundingClientRect();
+        const to = navScore.getBoundingClientRect();
+        const sx = from.left + from.width / 2;
+        const sy = from.top + from.height / 2;
+        const ex = to.left + to.width / 2;
+        const ey = to.top + to.height / 2;
+        const count = Math.min(6, Math.max(3, Math.round(amount / 800)));
+        const duration = 720;
+
+        return Promise.all(Array.from({ length: count }, (_, i) => new Promise(resolve => {
+          const orb = document.createElement('span');
+          orb.className = 'xp-fly-orb';
+          orb.textContent = i === count - 1 ? '+' + amount.toLocaleString() : '✦';
+          const spread = (i - (count - 1) / 2) * 16;
+          const startX = sx + spread;
+          orb.style.left = startX + 'px';
+          orb.style.top = sy + 'px';
+          orb.style.transform = 'translate(-50%, -50%)';
+          document.body.appendChild(orb);
+
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              const delay = i * 65;
+              orb.style.transition = `transform ${duration}ms cubic-bezier(.2, .85, .3, 1), opacity ${duration}ms ease`;
+              setTimeout(() => {
+                orb.style.transform = `translate(calc(-50% + ${ex - startX}px), calc(-50% + ${ey - sy}px)) scale(0.3)`;
+                orb.style.opacity = '0';
+              }, delay);
+              setTimeout(() => {
+                orb.remove();
+                resolve();
+              }, delay + duration + 60);
+            });
+          });
+        })));
+      }
+
+      function claimProjectXP(btn) {
+        if (!btn) return Promise.resolve(false);
+
+        const projectId = btn.dataset.project;
+        const xp = Number(btn.dataset.xp) || 0;
+        const claimed = getClaimedProjects();
+
+        if (btn.classList.contains('collected') || claimed.includes(projectId)) {
+          markBadgeCollected(btn);
+          return Promise.resolve(false);
+        }
+
+        if (btn._claimPromise) return btn._claimPromise;
+
+        btn.classList.add('claiming');
+
+        btn._claimPromise = flyXPParticles(btn, xp).then(() => {
+          if (!claimed.includes(projectId)) {
+            claimed.push(projectId);
+            saveClaimedProjects(claimed);
+          }
+          markBadgeCollected(btn);
+          updateScore(true);
+          if (navScore) {
+            navScore.classList.remove('xp-bump');
+            void navScore.offsetWidth;
+            navScore.classList.add('xp-bump');
+            setTimeout(() => navScore.classList.remove('xp-bump'), 600);
+          }
+          window.dispatchEvent(new CustomEvent('mckenna:xp-claimed'));
+          return true;
+        }).finally(() => {
+          btn._claimPromise = null;
+        });
+
+        return btn._claimPromise;
+      }
+
+
+      document.querySelectorAll('.pc-xp-badge[data-project]').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.preventDefault();
+          e.stopPropagation();
+          claimProjectXP(btn);
+        });
+      });
+
+      function openProjectCaseStudy(card) {
+        if (!card || card.dataset.navigating === 'true') return;
+
+        const link = card.querySelector('.pc-expand-btn[href]');
+        const href = link?.getAttribute('href');
+        if (!href) return;
+
+        const badge = card.querySelector('.pc-xp-badge[data-project]');
+        const alreadyClaimed = !badge
+          || badge.classList.contains('collected')
+          || getClaimedProjects().includes(badge.dataset.project);
+
+        if (alreadyClaimed) {
+          window.location.href = href;
+          return;
+        }
+
+        card.dataset.navigating = 'true';
+        if (link) link.setAttribute('aria-busy', 'true');
+
+        claimProjectXP(badge).then(() => {
+          setTimeout(() => { window.location.href = href; }, 300);
+        });
+      }
+
+      document.querySelectorAll('.project-card').forEach(card => {
+        const link = card.querySelector('.pc-expand-btn[href]');
+        if (!link) return;
+
+        const title = card.querySelector('.pc-title')?.textContent?.trim();
+        card.setAttribute('role', 'link');
+        card.tabIndex = 0;
+        if (title) card.setAttribute('aria-label', `Open case study: ${title}`);
+
+        card.addEventListener('click', e => {
+          if (e.target.closest('.pc-xp-badge')) return;
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+          e.preventDefault();
+          openProjectCaseStudy(card);
+        });
+
+        card.addEventListener('keydown', e => {
+          if (e.target.closest('.pc-xp-badge')) return;
+          if (e.key !== 'Enter' && e.key !== ' ') return;
+          e.preventDefault();
+          openProjectCaseStudy(card);
+        });
+      });
+
+      restoreClaimedXP();
+      updateProgressBar();
+
+      window.addEventListener('scroll', () => {
+        updateScore();
+      });
+
+      // Reveal
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); } });
+      }, { threshold: 0.1 });
+      document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+      // Skill card click interaction
+      const skillSparkleColors = ['var(--lemon)', 'var(--coral)', 'var(--mint)', 'var(--sky)', 'var(--lilac)'];
+      const skillMotionReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function spawnSkillSparkles(card) {
+        if (skillMotionReduced) return;
+        const icon = card.querySelector('.sc-icon');
+        if (!icon) return;
+        const rect = icon.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        for (let i = 0; i < 6; i++) {
+          const sparkle = document.createElement('span');
+          sparkle.className = 'skill-sparkle';
+          sparkle.textContent = '✦';
+          sparkle.style.left = cx + 'px';
+          sparkle.style.top = cy + 'px';
+          sparkle.style.color = skillSparkleColors[i % skillSparkleColors.length];
+          const angle = (i / 6) * Math.PI * 2 + Math.random() * 0.4;
+          const dist = 28 + Math.random() * 22;
+          sparkle.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+          sparkle.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+          document.body.appendChild(sparkle);
+          setTimeout(() => sparkle.remove(), 700);
+        }
+      }
+
+      function replaySkillBar(card) {
+        const fill = card.querySelector('.sc-xp-fill');
+        if (!fill || !card.classList.contains('in')) return;
+        fill.style.transition = 'none';
+        fill.style.transform = 'scaleX(0)';
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            fill.style.transition = '';
+            fill.style.transform = 'scaleX(1)';
+          });
+        });
+      }
+
+      // Hero skill badge → modal
+      const skillModal = document.getElementById('skillModal');
+      const skillModalCard = document.getElementById('skillModalCard');
+      const skillModalClose = document.getElementById('skillModalClose');
+      let skillModalLastFocus = null;
+
+      const skillDetails = {
+        'sc-1': {
+          icon: '🎨',
+          title: 'Visual Design',
+          desc: 'Crafting interfaces that feel polished, intentional, and delightful. Typography, layout, color, motion.',
+          tools: ['Figma', 'Webflow', 'Adobe Creative Cloud']
+        },
+        'sc-2': {
+          icon: '🔬',
+          title: 'UX Research',
+          desc: 'User interviews, journey maps, empathy mapping, usability testing, synthesising insights into real design decisions.',
+          tools: ['UserTesting', 'Eye Tracking', 'Data Analysis']
+        },
+        'sc-3': {
+          icon: '⚛️',
+          title: 'Front End Development',
+          desc: 'Building fast, accessible, component-driven UIs. I write the markup I design — no translation needed.',
+          tools: ['HTML', 'CSS', 'JavaScript', 'TypeScript', 'Next.js', 'React']
+        },
+        'sc-4': {
+          icon: '🧩',
+          title: 'Design Systems',
+          desc: 'Tokens, components, documentation — bridging design and engineering at scale.',
+          tools: ['Component Libraries', 'Pattern Libraries', 'Documentation and Principles']
+        },
+        'sc-5': {
+          icon: '✨',
+          title: '3D & Animation',
+          desc: 'Micro-interactions, scroll-driven animations, CSS Variables, CSS Grid, and transitions that elevate without distracting. Making the web more beautiful and functional.',
+          tools: ['CSS', 'Parallax', 'GSAP']
+        },
+        'sc-6': {
+          icon: '🧰',
+          title: 'My Design Tools',
+          desc: 'Figma, Webflow, Adobe Creative Cloud, Claude, Cursor, VS Code, Github, Dribble, Spline, Jitter, Blender, and more.',
+          tools: ['Figma', 'VS Code', 'Adobe CC', 'Claude', 'Github', 'Cursor', 'Spline', 'Webflow']
+        }
+      };
+
+      function closeSkillModal() {
+        if (!skillModal || !skillModal.classList.contains('open')) return;
+        skillModal.classList.remove('open');
+        document.body.classList.remove('skill-modal-open');
+        document.querySelectorAll('.htag[aria-pressed="true"]').forEach(tag => {
+          tag.setAttribute('aria-pressed', 'false');
+        });
+        setTimeout(() => {
+          if (!skillModal.classList.contains('open')) {
+            skillModal.hidden = true;
+            if (skillModalCard) {
+              skillModalCard.classList.remove('is-ready');
+              skillModalCard.innerHTML = '';
+              skillModalCard.className = 'skill-modal-card';
+            }
+          }
+        }, 200);
+        if (skillModalLastFocus && typeof skillModalLastFocus.focus === 'function') {
+          skillModalLastFocus.focus();
+        }
+      }
+
+      function openSkillModal(skillId, triggerEl) {
+        const skill = skillDetails[skillId];
+        if (!skillModal || !skillModalCard || !skill) return;
+
+        skillModalLastFocus = triggerEl || document.activeElement;
+        const toolsHtml = skill.tools.map(t => '<span class="tool-chip">' + t + '</span>').join('');
+
+        skillModalCard.className = 'skill-modal-card ' + skillId;
+        skillModalCard.innerHTML =
+          '<span class="sc-icon">' + skill.icon + '</span>' +
+          '<div class="sc-title" id="skillModalTitle">' + skill.title + '</div>' +
+          '<div class="sc-desc">' + skill.desc + '</div>' +
+          '<div class="sc-tools">' + toolsHtml + '</div>' +
+          '<div class="sc-xp"><div class="sc-xp-track"><div class="sc-xp-fill"></div></div></div>';
+
+        document.querySelectorAll('.htag[data-skill]').forEach(tag => {
+          tag.setAttribute('aria-pressed', tag.dataset.skill === skillId ? 'true' : 'false');
+        });
+
+        skillModal.hidden = false;
+        document.body.classList.add('skill-modal-open');
+        requestAnimationFrame(() => {
+          skillModal.classList.add('open');
+          requestAnimationFrame(() => skillModalCard.classList.add('is-ready'));
+        });
+        skillModalClose?.focus();
+      }
+
+      document.querySelectorAll('.htag[data-skill]').forEach(tag => {
+        tag.setAttribute('aria-pressed', 'false');
+        tag.addEventListener('click', () => openSkillModal(tag.dataset.skill, tag));
+      });
+
+      skillModalClose?.addEventListener('click', closeSkillModal);
+      skillModal?.querySelector('[data-skill-close]')?.addEventListener('click', closeSkillModal);
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeSkillModal();
+      });
+
+      // Toast
+      const toastEl = document.getElementById('toast');
+      const toastData = {
+        projects: ['📜', 'QUEST LOG OPENED!', 'Case studies incoming'],
+        vibe: ['🎧', 'SOUNDTRACK UNLOCKED!', 'Load a tape'],
+        achievements: ['🏆', 'BADGE ROOM ENTERED!', 'So many trophies...'],
+        about: ['👾', 'PLAYER PROFILE LOADED!', 'Getting personal'],
+        contact: ['💌', 'COMMS ARRAY ONLINE!', 'Let\'s collab'],
+      };
+      const shown = new Set();
+      let tt;
+      function showToast(icon, title, sub) {
+        clearTimeout(tt);
+        document.getElementById('toastIcon').textContent = icon;
+        document.getElementById('toastTitle').textContent = title;
+        document.getElementById('toastSub').textContent = sub;
+        toastEl.classList.add('show');
+        tt = setTimeout(() => toastEl.classList.remove('show'), 3200);
+      }
+      window.showToast = showToast;
+      document.querySelectorAll('.section-wrap[id]').forEach(sec => {
+        new IntersectionObserver(entries => {
+          entries.forEach(e => {
+            if (e.isIntersecting && !shown.has(sec.id)) {
+              shown.add(sec.id);
+              const d = toastData[sec.id];
+              if (d) showToast(...d);
+            }
+          });
+        }, { threshold: 0.35 }).observe(sec);
+      });
+
+      // Project expand
+      function toggleProject(id, btn) {
+        const d = document.getElementById(id + '-details');
+        const open = d.classList.toggle('open');
+        btn.classList.toggle('open');
+        btn.childNodes[0].textContent = open ? 'Close case study ' : 'Check Out Work ';
+      }
+
+      // Vibe cassette player
+      (function initVibePlayer() {
+        const persist = window.VibePersist;
+        if (!persist) return;
+        const tracks = persist.TRACKS.map(track => ({
+          ...track,
+          src: persist.trackSrc(track, 'assets/vibes')
+        }));
+
+        const deck = document.getElementById('vibeDeck');
+        const audio = document.getElementById('vibeAudio');
+        const playBtn = document.getElementById('vibePlay');
+        const playIcon = document.getElementById('vibePlayIcon');
+        const playLabel = document.getElementById('vibePlayLabel');
+        const ejectBtn = document.getElementById('vibeEject');
+        const prevBtn = document.getElementById('vibePrev');
+        const nextBtn = document.getElementById('vibeNext');
+        const titleEl = document.getElementById('vibeNowTitle');
+        const metaEl = document.getElementById('vibeNowMeta');
+        const nowLabel = document.getElementById('vibeNowLabel');
+        const labelEl = document.getElementById('vibeLabelText');
+        const progressFill = document.getElementById('vibeProgressFill');
+        const tapeBtns = Array.from(document.querySelectorAll('.tape-card[data-vibe]'));
+        const cassetteSlot = document.getElementById('cassetteSlot');
+        if (!deck || !audio || !playBtn || !tapeBtns.length || !cassetteSlot) return;
+
+        let index = -1;
+        let loaded = false;
+        let raf = 0;
+        let swapping = false;
+        let dragState = null;
+        let suppressPersist = false;
+
+        function persistNow(overrides = {}) {
+          if (suppressPersist) return;
+          if (!loaded || index < 0) {
+            persist.clearState();
+            return;
+          }
+          persist.saveState({
+            index,
+            time: audio.currentTime || 0,
+            playing: !audio.paused,
+            loaded: true,
+            ...overrides
+          });
+        }
+
+        function setControlsEnabled(on) {
+          playBtn.disabled = !on;
+          if (ejectBtn) ejectBtn.disabled = !on;
+          if (prevBtn) prevBtn.disabled = !on;
+          if (nextBtn) nextBtn.disabled = !on;
+        }
+
+        function setPlayingUI(isPlaying) {
+          deck.classList.toggle('is-playing', isPlaying);
+          playBtn.setAttribute('aria-pressed', isPlaying ? 'true' : 'false');
+          if (playIcon) playIcon.textContent = isPlaying ? '❚❚' : '▶';
+          if (playLabel) playLabel.textContent = isPlaying ? 'Pause' : 'Play';
+        }
+
+        function updateProgress() {
+          if (!audio.duration || !isFinite(audio.duration)) {
+            if (progressFill) progressFill.style.width = '0%';
+          } else if (progressFill) {
+            progressFill.style.width = ((audio.currentTime / audio.duration) * 100) + '%';
+          }
+          if (!audio.paused) raf = requestAnimationFrame(updateProgress);
+        }
+
+        function markRack() {
+          tapeBtns.forEach((btn, btnIndex) => {
+            const active = loaded && btnIndex === index;
+            btn.classList.toggle('is-loaded', active);
+            btn.setAttribute('aria-selected', active ? 'true' : 'false');
+            const action = btn.querySelector('.tape-card-action');
+            if (action) action.textContent = active ? 'Loaded ✓' : 'Drag to deck';
+          });
+        }
+
+        function pointInSlot(clientX, clientY) {
+          const rect = cassetteSlot.getBoundingClientRect();
+          return clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom;
+        }
+
+        function endPointerDrag(clientX, clientY) {
+          if (!dragState) return;
+          const { vibe, ghost, source } = dragState;
+          const dropped = pointInSlot(clientX, clientY);
+          ghost.remove();
+          source.classList.remove('is-dragging');
+          cassetteSlot.classList.remove('is-drop-target');
+          dragState = null;
+          if (dropped) insertTape(vibe, { autoplay: true });
+        }
+
+        function startPointerDrag(btn, event) {
+          if (event.button != null && event.button !== 0) return;
+          if (swapping) return;
+          event.preventDefault();
+
+          const vibe = Number(btn.dataset.vibe);
+          const ghost = btn.cloneNode(true);
+          ghost.classList.add('tape-drag-ghost');
+          ghost.removeAttribute('draggable');
+          ghost.style.setProperty('--vibe-color', getComputedStyle(btn).getPropertyValue('--vibe-color') || 'var(--coral)');
+          document.body.appendChild(ghost);
+
+          const offsetX = 40;
+          const offsetY = 24;
+          ghost.style.left = (event.clientX - offsetX) + 'px';
+          ghost.style.top = (event.clientY - offsetY) + 'px';
+
+          btn.classList.add('is-dragging');
+          dragState = { vibe, ghost, source: btn, offsetX, offsetY, moved: false, startX: event.clientX, startY: event.clientY };
+
+          const onMove = (e) => {
+            if (!dragState) return;
+            const x = e.clientX ?? e.touches?.[0]?.clientX;
+            const y = e.clientY ?? e.touches?.[0]?.clientY;
+            if (x == null || y == null) return;
+            if (Math.abs(x - dragState.startX) > 4 || Math.abs(y - dragState.startY) > 4) {
+              dragState.moved = true;
+            }
+            dragState.ghost.style.left = (x - dragState.offsetX) + 'px';
+            dragState.ghost.style.top = (y - dragState.offsetY) + 'px';
+            cassetteSlot.classList.toggle('is-drop-target', pointInSlot(x, y));
+          };
+
+          const onUp = (e) => {
+            window.removeEventListener('pointermove', onMove);
+            window.removeEventListener('pointerup', onUp);
+            window.removeEventListener('pointercancel', onUp);
+            const x = e.clientX ?? e.changedTouches?.[0]?.clientX ?? dragState?.startX;
+            const y = e.clientY ?? e.changedTouches?.[0]?.clientY ?? dragState?.startY;
+            const moved = dragState?.moved;
+            const vibeId = dragState?.vibe;
+            endPointerDrag(x, y);
+            // Short click still loads the tape for accessibility
+            if (!moved && vibeId != null) insertTape(vibeId, { autoplay: true });
+          };
+
+          window.addEventListener('pointermove', onMove);
+          window.addEventListener('pointerup', onUp);
+          window.addEventListener('pointercancel', onUp);
+        }
+
+        function showEmptyState({ clearPersist = true } = {}) {
+          loaded = false;
+          index = -1;
+          deck.classList.remove('has-tape', 'is-playing', 'is-ejecting');
+          setPlayingUI(false);
+          setControlsEnabled(false);
+          if (nowLabel) nowLabel.textContent = 'No tape loaded';
+          if (titleEl) titleEl.textContent = 'Browse the rack';
+          if (metaEl) metaEl.textContent = 'Drag a cassette into the deck to play';
+          if (progressFill) progressFill.style.width = '0%';
+          markRack();
+          if (clearPersist) persist.clearState();
+        }
+
+        function insertTape(i, { autoplay = true, startAt = 0, animate = true } = {}) {
+          if (swapping) return;
+          const next = (i + tracks.length) % tracks.length;
+          const track = tracks[next];
+          const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+          const doLoad = () => {
+            index = next;
+            loaded = true;
+            swapping = false;
+            deck.classList.remove('is-ejecting');
+            deck.classList.add('has-tape');
+            deck.style.setProperty('--vibe-color', track.color);
+            audio.src = track.src;
+            audio.load();
+            if (labelEl) labelEl.textContent = track.title;
+            if (nowLabel) nowLabel.textContent = 'Now playing';
+            if (titleEl) titleEl.textContent = track.title;
+            if (metaEl) metaEl.textContent = track.meta;
+            if (progressFill) progressFill.style.width = '0%';
+            setControlsEnabled(true);
+            markRack();
+
+            const seekAndMaybePlay = () => {
+              if (startAt > 0 && isFinite(audio.duration)) {
+                audio.currentTime = Math.min(startAt, Math.max(0, audio.duration - 0.25));
+              }
+              if (autoplay) {
+                audio.play().then(() => {
+                  setPlayingUI(true);
+                  cancelAnimationFrame(raf);
+                  raf = requestAnimationFrame(updateProgress);
+                  persistNow({ playing: true });
+                }).catch(() => {
+                  setPlayingUI(false);
+                  persistNow({ playing: false });
+                });
+              } else {
+                setPlayingUI(false);
+                persistNow({ playing: false, time: audio.currentTime || startAt || 0 });
+              }
+            };
+
+            if (audio.readyState >= 1) seekAndMaybePlay();
+            else audio.addEventListener('loadedmetadata', seekAndMaybePlay, { once: true });
+          };
+
+          if (loaded && index === next && animate) {
+            if (audio.paused && autoplay) {
+              audio.play().then(() => {
+                setPlayingUI(true);
+                cancelAnimationFrame(raf);
+                raf = requestAnimationFrame(updateProgress);
+                persistNow({ playing: true });
+              }).catch(() => setPlayingUI(false));
+            }
+            return;
+          }
+
+          swapping = true;
+          audio.pause();
+          setPlayingUI(false);
+          cancelAnimationFrame(raf);
+
+          if (loaded && animate && !reduceMotion) {
+            deck.classList.add('is-ejecting');
+            window.setTimeout(doLoad, 280);
+          } else {
+            doLoad();
+          }
+        }
+
+        function ejectTape() {
+          if (!loaded || swapping) return;
+          swapping = true;
+          audio.pause();
+          setPlayingUI(false);
+          cancelAnimationFrame(raf);
+          persist.clearState();
+          deck.classList.add('is-ejecting');
+          const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.setTimeout(() => {
+            audio.removeAttribute('src');
+            audio.load();
+            showEmptyState();
+            swapping = false;
+          }, reduceMotion ? 0 : 280);
+        }
+
+        playBtn.addEventListener('click', () => {
+          if (!loaded) return;
+          if (audio.paused) {
+            audio.play().then(() => {
+              setPlayingUI(true);
+              cancelAnimationFrame(raf);
+              raf = requestAnimationFrame(updateProgress);
+              persistNow({ playing: true });
+            }).catch(() => setPlayingUI(false));
+          } else {
+            audio.pause();
+            setPlayingUI(false);
+            cancelAnimationFrame(raf);
+            persistNow({ playing: false });
+          }
+        });
+
+        ejectBtn?.addEventListener('click', ejectTape);
+        prevBtn?.addEventListener('click', () => {
+          if (!loaded) return;
+          insertTape(index - 1, { autoplay: !audio.paused });
+        });
+        nextBtn?.addEventListener('click', () => {
+          if (!loaded) return;
+          insertTape(index + 1, { autoplay: !audio.paused });
+        });
+
+        tapeBtns.forEach(btn => {
+          btn.addEventListener('pointerdown', (event) => startPointerDrag(btn, event));
+
+          // Native HTML5 DnD fallback (desktop)
+          btn.addEventListener('dragstart', (event) => {
+            event.dataTransfer.setData('text/vibe', btn.dataset.vibe);
+            event.dataTransfer.effectAllowed = 'copy';
+            btn.classList.add('is-dragging');
+          });
+          btn.addEventListener('dragend', () => {
+            btn.classList.remove('is-dragging');
+            cassetteSlot.classList.remove('is-drop-target');
+          });
+        });
+
+        cassetteSlot.addEventListener('dragover', (event) => {
+          event.preventDefault();
+          event.dataTransfer.dropEffect = 'copy';
+          cassetteSlot.classList.add('is-drop-target');
+        });
+        cassetteSlot.addEventListener('dragleave', () => {
+          cassetteSlot.classList.remove('is-drop-target');
+        });
+        cassetteSlot.addEventListener('drop', (event) => {
+          event.preventDefault();
+          cassetteSlot.classList.remove('is-drop-target');
+          const vibe = event.dataTransfer.getData('text/vibe');
+          if (vibe !== '') insertTape(Number(vibe), { autoplay: true });
+        });
+
+        audio.addEventListener('ended', () => {
+          if (!loaded) return;
+          insertTape(index + 1, { autoplay: true });
+        });
+        audio.addEventListener('pause', () => {
+          if (!audio.ended) setPlayingUI(false);
+          persistNow({ playing: false });
+        });
+        audio.addEventListener('play', () => {
+          persistNow({ playing: true });
+        });
+        audio.addEventListener('timeupdate', () => {
+          if (!audio.paused) persistNow();
+        });
+
+        window.addEventListener('pagehide', () => persistNow());
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'hidden') persistNow();
+        });
+
+        // Save before case-study navigations so playback can resume immediately.
+        document.addEventListener('click', (event) => {
+          const link = event.target.closest('a[href*="case-studies/"]');
+          if (!link) return;
+          persistNow({ playing: loaded && !audio.paused });
+        }, true);
+
+        // Read saved state BEFORE emptying UI — showEmptyState used to wipe it first.
+        const saved = persist.loadState();
+        if (saved && saved.loaded) {
+          showEmptyState({ clearPersist: false });
+          suppressPersist = true;
+          insertTape(saved.index, {
+            autoplay: !!saved.playing,
+            startAt: saved.time || 0,
+            animate: false
+          });
+          suppressPersist = false;
+          persistNow({
+            index: saved.index,
+            time: saved.time || 0,
+            playing: !!saved.playing,
+            loaded: true
+          });
+        } else {
+          showEmptyState();
+        }
+      })();
+
+    </script>
+    <script src="agent-guide.js"></script>
+    <script>
+      initAgentGuide();
+      if (window.__skipLoaderPending && window.showAgentGuide) showAgentGuide();
+
+      const agentWidget = document.getElementById('agentWidget');
+      const projectsSection = document.getElementById('projects');
+      if (agentWidget && projectsSection) {
+        const dismissAgentHintPastProjects = () => {
+          if (projectsSection.getBoundingClientRect().bottom <= 0) {
+            agentWidget.classList.add('hint-dismissed');
+            window.removeEventListener('scroll', dismissAgentHintPastProjects);
+          }
+        };
+
+        dismissAgentHintPastProjects();
+        window.addEventListener('scroll', dismissAgentHintPastProjects, { passive: true });
+      }
+
+      // Bonus hopping dino runner (reveals at page bottom; play unlocks after all XP)
+      (function initHoppingDinoGame() {
+        const section = document.getElementById('bonusGame');
+        const boot = document.getElementById('dinoBoot');
+        const gameContent = document.getElementById('dinoGameContent');
+        const shell = document.getElementById('dinoGameShell');
+        const lockModal = document.getElementById('dinoLockModal');
+        const canvas = document.getElementById('dinoGameCanvas');
+        const overlay = document.getElementById('dinoGameOverlay');
+        const startBtn = document.getElementById('dinoGameStart');
+        const scoreEl = document.getElementById('dinoGameScore');
+        const bestEl = document.getElementById('dinoGameBest');
+        const speedEl = document.getElementById('dinoGameSpeed');
+        const overlayTitle = document.getElementById('dinoGameOverlayTitle');
+        const overlayText = document.getElementById('dinoGameOverlayText');
+        if (!section || !boot || !gameContent || !shell || !lockModal || !canvas || !overlay || !startBtn) return;
+
+        const ctx = canvas.getContext('2d');
+        const BEST_KEY = 'mckenna_dino_hop_best';
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        let best = Number(localStorage.getItem(BEST_KEY) || 0);
+        bestEl.textContent = String(best).padStart(5, '0');
+
+        let revealed = false;
+        let booting = false;
+        let playable = false;
+        let running = false;
+        let raf = 0;
+        let width = 900;
+        let height = 220;
+        let dpr = 1;
+        let groundY = 170;
+        let score = 0;
+        let speed = 6;
+        let spawnTimer = 0;
+        let groundOffset = 0;
+        let frame = 0;
+        let obstacles = [];
+        let clouds = [];
+        let dino = null;
+
+        function padScore(n) {
+          return String(Math.floor(n)).padStart(5, '0');
+        }
+
+        function hasFullXP() {
+          return typeof window.isXPFull === 'function' && window.isXPFull();
+        }
+
+        function setPlayable(unlocked) {
+          playable = unlocked;
+          shell.classList.toggle('is-locked', !unlocked);
+          lockModal.hidden = unlocked;
+          if (unlocked) {
+            overlay.hidden = false;
+            if (overlayTitle) overlayTitle.textContent = 'Secret level unlocked';
+            if (overlayText) overlayText.textContent = 'A tiny endless runner — jump the cacti, keep hopping, chase a high score.';
+          } else {
+            overlay.hidden = true;
+            if (running) {
+              running = false;
+              cancelAnimationFrame(raf);
+            }
+          }
+        }
+
+        function syncXpLock() {
+          if (!revealed) return;
+          const ready = hasFullXP();
+          if (ready && !playable) {
+            setPlayable(true);
+            if (typeof window.showToast === 'function') {
+              window.showToast('🦕', 'SECRET LEVEL UNLOCKED!', 'Hopping Dino is ready');
+            }
+          } else if (!ready) {
+            setPlayable(false);
+          }
+        }
+
+        function resize() {
+          const rect = canvas.getBoundingClientRect();
+          dpr = Math.min(window.devicePixelRatio || 1, 2);
+          width = Math.max(320, Math.floor(rect.width));
+          height = Math.max(180, Math.floor(rect.height));
+          canvas.width = Math.floor(width * dpr);
+          canvas.height = Math.floor(height * dpr);
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          groundY = height - 44;
+          if (dino) {
+            dino.baseY = groundY;
+            if (!dino.jumping) dino.y = groundY;
+          }
+        }
+
+        function makeDino() {
+          return {
+            x: 72,
+            y: groundY,
+            baseY: groundY,
+            w: 44,
+            h: 48,
+            vy: 0,
+            jumping: false,
+            gravity: 0.75,
+            jumpForce: -13.2
+          };
+        }
+
+        function revealGame() {
+          boot.hidden = true;
+          boot.setAttribute('aria-busy', 'false');
+          gameContent.hidden = false;
+          revealed = true;
+          requestAnimationFrame(() => {
+            gameContent.classList.add('is-ready');
+            resize();
+            dino = makeDino();
+            seedClouds();
+            drawScene(false);
+            syncXpLock();
+          });
+        }
+
+        function runBootSequence() {
+          if (booting) return;
+          booting = true;
+          boot.hidden = false;
+          boot.setAttribute('aria-busy', 'true');
+          gameContent.hidden = true;
+          gameContent.classList.remove('is-ready');
+
+          const duration = prefersReducedMotion ? 120 : 900;
+          setTimeout(revealGame, duration);
+        }
+
+        function unlockGame() {
+          if (revealed || booting) return;
+          section.classList.add('is-unlocked');
+          requestAnimationFrame(() => {
+            section.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'nearest' });
+          });
+          runBootSequence();
+        }
+
+        function seedClouds() {
+          clouds = [
+            { x: width * 0.2, y: 36, s: 1 },
+            { x: width * 0.55, y: 58, s: 0.8 },
+            { x: width * 0.85, y: 42, s: 1.1 }
+          ];
+        }
+
+        function resetRound() {
+          score = 0;
+          speed = 6;
+          spawnTimer = 70;
+          groundOffset = 0;
+          frame = 0;
+          obstacles = [];
+          dino = makeDino();
+          seedClouds();
+          scoreEl.textContent = '00000';
+          speedEl.textContent = '1.0x';
+        }
+
+        function jump() {
+          if (!running || !dino || dino.jumping) return;
+          dino.jumping = true;
+          dino.vy = dino.jumpForce;
+        }
+
+        function spawnObstacle() {
+          const tall = Math.random() > 0.55;
+          const cluster = Math.random() > 0.72 ? 2 : 1;
+          const h = tall ? 46 + Math.random() * 10 : 30 + Math.random() * 8;
+          const w = cluster === 2 ? 34 : 18;
+          obstacles.push({
+            x: width + 20,
+            y: groundY,
+            w,
+            h,
+            cluster
+          });
+        }
+
+        function drawCloud(c) {
+          ctx.fillStyle = 'rgba(26,18,7,0.12)';
+          const s = 16 * c.s;
+          ctx.beginPath();
+          ctx.arc(c.x, c.y, s, 0, Math.PI * 2);
+          ctx.arc(c.x + s * 0.9, c.y + 2, s * 0.75, 0, Math.PI * 2);
+          ctx.arc(c.x - s * 0.8, c.y + 3, s * 0.7, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        function drawGround() {
+          ctx.strokeStyle = '#1a1207';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(0, groundY);
+          ctx.lineTo(width, groundY);
+          ctx.stroke();
+
+          ctx.fillStyle = '#1a1207';
+          for (let x = -((groundOffset | 0) % 28); x < width; x += 28) {
+            ctx.fillRect(x, groundY + 6, 14, 2);
+            ctx.fillRect(x + 8, groundY + 14, 8, 2);
+          }
+        }
+
+        function drawDino(d, animFrame) {
+          const x = d.x;
+          const y = d.y - d.h;
+          const leg = d.jumping ? 0 : (animFrame % 2 === 0 ? -4 : 4);
+          ctx.fillStyle = '#1a1207';
+
+          // body
+          ctx.fillRect(x + 8, y + 14, 28, 22);
+          // head
+          ctx.fillRect(x + 24, y + 2, 22, 18);
+          // snout
+          ctx.fillRect(x + 42, y + 10, 10, 8);
+          // eye
+          ctx.fillStyle = '#fff';
+          ctx.fillRect(x + 38, y + 6, 4, 4);
+          ctx.fillStyle = '#1a1207';
+          // tail
+          ctx.fillRect(x - 6, y + 20, 16, 6);
+          // arm
+          ctx.fillRect(x + 18, y + 24, 8, 4);
+          // legs
+          ctx.fillRect(x + 12, y + 34, 7, 14 + (leg < 0 ? leg : 0));
+          ctx.fillRect(x + 26, y + 34, 7, 14 + (leg > 0 ? -leg : 0));
+        }
+
+        function drawCactus(o) {
+          const baseX = o.x;
+          const top = o.y - o.h;
+          ctx.fillStyle = '#1a1207';
+          if (o.cluster === 2) {
+            ctx.fillRect(baseX, top + 8, 10, o.h - 8);
+            ctx.fillRect(baseX + 14, top, 12, o.h);
+            ctx.fillRect(baseX - 2, top + 16, 8, 6);
+            ctx.fillRect(baseX + 22, top + 12, 8, 6);
+          } else {
+            ctx.fillRect(baseX + 4, top, 10, o.h);
+            ctx.fillRect(baseX - 2, top + o.h * 0.35, 8, 6);
+            ctx.fillRect(baseX - 2, top + o.h * 0.35, 4, 16);
+            ctx.fillRect(baseX + 12, top + o.h * 0.45, 8, 6);
+            ctx.fillRect(baseX + 16, top + o.h * 0.45, 4, 14);
+          }
+        }
+
+        function drawScene(anim) {
+          ctx.clearRect(0, 0, width, height);
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, width, height);
+          clouds.forEach(drawCloud);
+          drawGround();
+          obstacles.forEach(drawCactus);
+          if (dino) drawDino(dino, anim ? Math.floor(frame / 6) : 0);
+        }
+
+        function rectsOverlap(a, b) {
+          return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+        }
+
+        function endGame() {
+          running = false;
+          cancelAnimationFrame(raf);
+          const finalScore = Math.floor(score);
+          if (finalScore > best) {
+            best = finalScore;
+            localStorage.setItem(BEST_KEY, String(best));
+            bestEl.textContent = padScore(best);
+          }
+          overlayTitle.textContent = 'Game over';
+          overlayText.textContent = `You hopped to ${padScore(finalScore)}. Best: ${padScore(best)}.`;
+          startBtn.textContent = 'Play again';
+          overlay.hidden = false;
+        }
+
+        function tick() {
+          if (!running || !dino) return;
+          frame++;
+
+          // physics
+          if (dino.jumping) {
+            dino.vy += dino.gravity;
+            dino.y += dino.vy;
+            if (dino.y >= dino.baseY) {
+              dino.y = dino.baseY;
+              dino.vy = 0;
+              dino.jumping = false;
+            }
+          }
+
+          speed = 6 + Math.min(score / 180, 7);
+          groundOffset += speed;
+          score += speed * 0.12;
+          scoreEl.textContent = padScore(score);
+          speedEl.textContent = (speed / 6).toFixed(1) + 'x';
+
+          clouds.forEach(c => {
+            c.x -= speed * 0.15;
+            if (c.x < -40) c.x = width + 40 + Math.random() * 80;
+          });
+
+          spawnTimer--;
+          if (spawnTimer <= 0) {
+            spawnObstacle();
+            spawnTimer = 55 + Math.random() * 50 - Math.min(score / 20, 25);
+          }
+
+          const next = [];
+          const dinoBox = {
+            x: dino.x + 8,
+            y: dino.y - dino.h + 8,
+            w: dino.w - 10,
+            h: dino.h - 10
+          };
+
+          for (const o of obstacles) {
+            o.x -= speed;
+            const box = {
+              x: o.x,
+              y: o.y - o.h,
+              w: o.w,
+              h: o.h - 2
+            };
+            if (rectsOverlap(dinoBox, box)) {
+              drawScene(true);
+              endGame();
+              return;
+            }
+            if (o.x + o.w > -20) next.push(o);
+          }
+          obstacles = next;
+
+          drawScene(true);
+          raf = requestAnimationFrame(tick);
+        }
+
+        function isGameReady() {
+          return playable && revealed && gameContent && !gameContent.hidden && !!boot?.hidden;
+        }
+
+        function startGame() {
+          if (!isGameReady()) return;
+          resize();
+          resetRound();
+          overlay.hidden = true;
+          running = true;
+          cancelAnimationFrame(raf);
+          raf = requestAnimationFrame(tick);
+        }
+
+        function onJumpInput(e) {
+          if (e.type === 'keydown') {
+            if (!(e.code === 'Space' || e.key === 'ArrowUp' || e.key === ' ')) return;
+            e.preventDefault();
+          }
+          if (!isGameReady()) return;
+          if (!running) {
+            if (overlay && !overlay.hidden && e.type === 'keydown') startGame();
+            return;
+          }
+          jump();
+        }
+
+        startBtn.addEventListener('click', startGame);
+        canvas.addEventListener('pointerdown', e => {
+          if (!isGameReady()) return;
+          if (!running) {
+            startGame();
+            return;
+          }
+          e.preventDefault();
+          jump();
+        });
+        window.addEventListener('keydown', onJumpInput, { passive: false });
+        window.addEventListener('resize', () => {
+          if (!revealed) return;
+          resize();
+          if (!running) drawScene(false);
+        });
+        window.addEventListener('mckenna:xp-claimed', syncXpLock);
+        window.addEventListener('mckenna:xp-updated', syncXpLock);
+
+        const unlockObserver = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) unlockGame();
+          });
+        }, { threshold: 0.55 });
+        const footer = document.querySelector('footer');
+        if (footer) unlockObserver.observe(footer);
+
+        window.addEventListener('scroll', () => {
+          if (revealed || booting) return;
+          const nearBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 120;
+          if (nearBottom) unlockGame();
+        }, { passive: true });
+      })();
+    </script>
+</body>
+
+</html>
